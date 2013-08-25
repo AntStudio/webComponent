@@ -8,122 +8,35 @@
   <meta name="Description" content="">
   <script src="../plugin/jquery.min.js" type="text/javascript"></script>
   <script src="../plugin/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+  <script src="../src/table.js" type="text/javascript"></script>
   <link href="../plugin/bootstrap/css/bootstrap.min.css" rel="stylesheet"/>
   <link href="../plugin/font-awesome/css/font-awesome.css" rel="stylesheet">
-  <style>
-	.datagrid{
-		position:relative;
-	}
-	.datagrid>table{
-		margin-bottom:0;
-	}
-
-	.datagrid>.grid-pagination{
-		padding: 5px;
-	}
-	.datagrid>.grid-pagination .data-info{
-		display:inline;
-		float:right;
-		line-height: 30px;
-	}
-
-	.datagrid>.grid-pagination .input-small{
-		width: 30px;
-		margin-bottom:0;
-		border-width:1px;
-		border-color:rgb(204, 204, 204);
-	}
-
-	.datagrid>.grid-pagination .input-small:focus{
-			border-color: rgba(82,168,236,0.8);
-	}
-
-	.icon-prev{
-		-moz-transform:scaleX(-1);
-		-webkit-transform:scaleX(-1);
-		-o-transform:scaleX(-1);
-		transform:scaleX(-1);
-		/*IE*/
-		filter:FlipH;
-		display: inline-block;
-	}
-
-	 .btn{
-		padding: 5px 10px;
-	}
-
-	.btn [class^="icon-"]{
-		width:8px;
-		display:inline-block;
-	}
-
-	.datagrid .table-bordered{
-		 border-bottom-left-radius: 0px;
-		 border-bottom-right-radius:0px;
-	}
-	.datagrid .table-bordered tbody:last-child tr:last-child>td:first-child{
-		 border-bottom-left-radius: 0px;
-	}
-	.grid-pagination{
-		border: 1px solid #ddd;
-		border-top:none;
-		border-bottom-left-radius: 4px;
-		border-bottom-right-radius:4px;
-		..background:#EDF3F2;
-	}
-
-	.grid-pagination .split{
-		border-left: 1px solid #D8D4D4;
-		display: inline;
-		padding: 5px 0;
-		margin: 0 5px;
-	}
-	
-	.pagination-btn{
-		cursor:pointer;
-		padding: 0 5px;
-	}
-	.pagination-btn:hover{
-		color:#4183c4;
-	}
-	.datagrid .modal-backdrop{
-	  position: absolute;
-	  top: 36px;
-	  left: 0px;
-	  bottom: 38px;
-	  right: 0;
-	  background: #F8F9FA;
-	  text-align:center;
-	}
-	.datagrid .modal-backdrop span{
-		position: absolute;
-		top: 50%;
-		margin-top: -22px;
-		border: 2px solid #5C9BFA;
-		padding: 10px;
-		left: 50%;
-		margin-left: -55px;
-		border-radius: 4px;
-	}
-
-	.datagrid .modal-backdrop span i{
-		margin-right:10px;
-	}
-  </style>
-
+  <link href="../src/table.css" rel="stylesheet">
   <script>
 	$(function(){
-	$(".datagrid .modal-backdrop").css({top:$(".datagrid thead").height()});
-		
-		$(".pagination-btn .icon-refresh").click(function(){
-			$(this).toggleClass("icon-spin").closest(".datagrid").find(".modal-backdrop").toggleClass("hide").toggleClass("in");
-		});
+		$("div.dynamic").table({columns:[{name:"id"},{name:"name"},{name:"code"}],
+			data:{total:4,
+			  rows:[
+					{"id":1,"name":"分配菜单","code":"000002"},
+			        {"id":3,"name":"用户列表","code":"000008"},
+					{"id":4,"name":"用户列表","code":"00000d"},
+					{"id":5,"name":"添加菜单信息","code":"000001"}
+					]
+			 },
+			 formatData:function(data){return data.rows;}
+		 });
 	});
   </script>
+  <style>
+	body{
+		padding:10px;
+	}
+  </style>
  </head>
 
  <body>
-	<div class="container datagrid">
+ <h3>静态示例</h3>
+	<div class="datagrid">
 		<table class="table table-bordered table-hover">
 		<thead>
 			<tr>
@@ -213,5 +126,10 @@
 			<span> <i class="icon-spinner icon-spin"></i>Loading...</span>
 		</div>
 	</div>
+
+
+	<h3>动态示例</h3>
+		<div class="dynamic">
+		</div>
  </body>
 </html>
