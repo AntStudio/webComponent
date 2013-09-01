@@ -14,7 +14,13 @@
   <link href="../src/table.css" rel="stylesheet">
   <script>
 	$(function(){
-		$("div.dynamic").table({columns:[{name:"id"},{name:"name"},{name:"code"}],
+		$("div.dynamic").table({
+		    columns:[
+			         {name:"id",render:function(rowData){return rowData.name;},width:200,display:'id(限宽200px)',sort:true},
+					 {name:"name",display:"权限名称(居中)",align:"center",sort:true,sortName:"name"},
+					 {name:"code"},
+					 {display:'附加列测试(居右)',align:"right",render:function(columnData){return "测试内容 for "+columnData.name;}}
+					 ],
 			data:{total:4,
 			  rows:[
 					{"id":1,"name":"分配菜单","code":"000002"},
@@ -24,6 +30,10 @@
 					]
 			 },
 			 formatData:function(data){return data.rows;}
+		 });
+
+		 $(".get-select").click(function(){
+			alert("一共选择了 "+$("div.dynamic").table("getSelect").length+"行");
 		 });
 	});
   </script>
@@ -129,7 +139,8 @@
 
 
 	<h3>动态示例</h3>
-		<div class="dynamic">
+		<div class="dynamic" >
 		</div>
+		<div><a class="btn btn-primary btn-block btn-large get-select">获取选择行</a></div>
  </body>
 </html>
