@@ -1,10 +1,10 @@
 /**
- * ±í¸ñ×é¼ş,Ö§³Öajax»ñÈ¡Êı¾İ
- * ´ıÍê³É:1¡¢apiÎÄµµ
- * 	    2¡¢pageSize¶¯Ì¬ÉèÖÃ
- * 		3¡¢±í¸ñ·ç¸ñÓÅ»¯(done)
- * 		4¡¢±í¸ñĞĞÑ¡ÔñÖ§³Ö(done)
- * 		5¡¢ÍÏ×§Ê½Ñ¡Ôñ(done)
+ * è¡¨æ ¼ç»„ä»¶,æ”¯æŒajaxè·å–æ•°æ®
+ * å¾…å®Œæˆ:1ã€apiæ–‡æ¡£
+ * 	    2ã€pageSizeåŠ¨æ€è®¾ç½®
+ * 		3ã€è¡¨æ ¼é£æ ¼ä¼˜åŒ–(done)
+ * 		4ã€è¡¨æ ¼è¡Œé€‰æ‹©æ”¯æŒ(done)
+ * 		5ã€æ‹–æ‹½å¼é€‰æ‹©(done)
  * @author Gavin Cook
  * @Date 2012-08-25
  */
@@ -16,26 +16,27 @@
 		pageSize:10,
 		params:{},
 		formatData:'',
-		showSelectBox:false,//ÊÇ·ñÏÔÊ¾µ¥Ñ¡¿ò»òÕß¸´Ñ¡¿ò
-		multiSelect:true,//ÊÇ·ñÔÊĞí¶àÑ¡
-		showNumber:true//ÊÇ·ñÏÔÊ¾ĞòºÅ(´Ó1¿ªÊ¼¼ÆÊı)
+		showSelectBox:false,//æ˜¯å¦æ˜¾ç¤ºå•é€‰æ¡†æˆ–è€…å¤é€‰æ¡†
+		multiSelect:true,//æ˜¯å¦å…è®¸å¤šé€‰
+		showNumber:true,//æ˜¯å¦æ˜¾ç¤ºåºå·(ä»1å¼€å§‹è®¡æ•°)
+		buttons:[]
 	};
 
-	var table  = {
+	var methods  = {
 		renderData:function(opts){
 			var $container = this;
-			var getData = table.getData.call(this,opts);
+			var getData = methods.getData.call(this,opts);
 			var dfd = $.Deferred();
 			getData.done(function(data){
 				opts.currentDataSize = data.length;
 				var dataHtml="<tbody>";
 				tableDataCache[$container.selector]=data;
 				$.each(data,function(index,columnData){
-					dataHtml+="<tr data-number=\""+(index)+"\">";//data-number±íÊ¾µ±Ç°ĞĞµÄĞòºÅ,ÓÃ»§»ñÈ¡Ñ¡ÔñĞĞÊ¹ÓÃ,´Ó0¿ªÊ¼¼ÆÊı
-					if(opts.showNumber){//´¦ÀíĞòºÅÁĞ
+					dataHtml+="<tr data-number=\""+(index)+"\" data-id=\"tr_"+columnData[(opts.rowId||{})]+"\">";//data-numberè¡¨ç¤ºå½“å‰è¡Œçš„åºå·,ç”¨æˆ·è·å–é€‰æ‹©è¡Œä½¿ç”¨,ä»0å¼€å§‹è®¡æ•°
+					if(opts.showNumber){//å¤„ç†åºå·åˆ—
 						dataHtml+="<td class=\"number\">"+(index+1)+"</td>";
 					}
-					if(opts.showSelectBox){//´¦Àíµ¥Ñ¡¿ò»ò¸´Ñ¡¿ò
+					if(opts.showSelectBox){//å¤„ç†å•é€‰æ¡†æˆ–å¤é€‰æ¡†
 						dataHtml+="<td><input name=\"selectBox\" type=\""+(opts.multiSelect?"checkbox":"radio")+"\"/></td>";
 					}
 					$.each(opts.columns,function(index,columnDefinition){
@@ -78,25 +79,33 @@
 		},
 		renderTable:function(opts){
 			var $container = this;
-			var tableHtml = "<div class=\"datagrid\"><table class=\"table table-bordered table-hover\">";
-			tableHtml+=table.renderHeader(opts);
+			table.opts = opts;
+			table.selector = $container.selector;
+			
+			var $tableDiv = $(document.createElement("div"));
+			opts.table = $tableDiv;
+			$tableDiv.addClass("datagrid").append(methods.renderTitle(opts));;
+			var tableHtml = "";
+			tableHtml+="<table class=\"table table-bordered table-hover\">";
+			tableHtml+=methods.renderHeader(opts);
 			var renderTableDfd = $.Deferred();
-			table.renderData.call($container,opts).done(function(tbody){
+			methods.renderData.call($container,opts).done(function(tbody){
 				tableHtml+=tbody;
 				renderTableDfd.resolve();
 			});
-
+			
 			$.when(renderTableDfd).done(function(){
 				tableHtml+="</table>";
-				tableHtml+=table.renderPagination(opts);
-				tableHtml+=table.renderModal();
-				tableHtml+=table.renderSelection();
+				tableHtml+=methods.renderPagination(opts);
+				tableHtml+=methods.renderModal();
+				tableHtml+=methods.renderSelection();
 				tableHtml+="</div>";
-				$container.html(tableHtml);
-				tableCache[$container.selector] = $(tableHtml);
-				table.bindEvents.call($container,opts);
-				tableCache[$container.selector]=tableHtml;
+				$container.append($tableDiv.append($(tableHtml)));
+				tableCache[$container.selector] = table;
+				methods.bindEvents.call($container,opts);
 			});
+			table.methods = methods;
+			return table;
 		},
 		renderPagination:function(opts){
 			var startIndex = (opts.pageIndex-1)*opts.pageSize+1;
@@ -118,15 +127,15 @@
 		   +"<span class=\"split\"></span>"
 		   +"<span class=\"pagination-btn\" action=\"refresh\"> <i class=\"icon-refresh\"></i></span><!-- icon-spin-->"
 		   +"<div class=\"data-info\">"
-		   +"<span>µ±Ç°ÏÔÊ¾</span>"
+		   +"<span>å½“å‰æ˜¾ç¤º</span>"
 		   +"<span class=\"current-data-info\">"+startIndex
 		   +"~"
 		   +endIndex
 		   +"</span>"
-		   +"<span>Ìõ,¹²</span>"
+		   +"<span>æ¡,å…±</span>"
 		   +"<span clss=\"total\">" 
 		   +opts.total
-		   +"Ìõ¼ÇÂ¼</span>"
+		   +"æ¡è®°å½•</span>"
 		   +"</div>"
 		   +"</div>";
 		   return paginationHtml;
@@ -155,15 +164,15 @@
 			$refreshBtn.toggleClass("icon-spin").closest(".datagrid").find(".modal-backdrop").toggleClass("hide").toggleClass("in");
 
 			
-			table.getData.call(this,opts).done(function(data){
+			methods.getData.call(this,opts).done(function(data){
 				tableDataCache[$container.selector]=data;
 				var dataHtml="";
 				$.each(data,function(index,columnData){
-					dataHtml+="<tr data-number=\""+(index)+"\">";//data-number±íÊ¾µ±Ç°ĞĞµÄĞòºÅ,ÓÃ»§»ñÈ¡Ñ¡ÔñĞĞÊ¹ÓÃ,´Ó0¿ªÊ¼¼ÆÊı
-					if(opts.showNumber){//´¦ÀíĞòºÅÁĞ
+					dataHtml+="<tr data-number=\""+(index)+"\">";//data-numberè¡¨ç¤ºå½“å‰è¡Œçš„åºå·,ç”¨æˆ·è·å–é€‰æ‹©è¡Œä½¿ç”¨,ä»0å¼€å§‹è®¡æ•°
+					if(opts.showNumber){//å¤„ç†åºå·åˆ—
 						dataHtml+="<td class=\"number\">"+(index+1)+"</td>";
 					}
-					if(opts.showSelectBox){//´¦Àíµ¥Ñ¡¿ò»ò¸´Ñ¡¿ò
+					if(opts.showSelectBox){//å¤„ç†å•é€‰æ¡†æˆ–å¤é€‰æ¡†
 						dataHtml+="<td><input name=\"selectBox\" type=\""+(opts.multiSelect?"checkbox":"radio")+"\"/></td>";
 					}
 					$.each(opts.columns,function(index,columnDefinition){
@@ -176,15 +185,15 @@
 					dataHtml+="</tr>";
 				});
 				$("table tbody",$container).html(dataHtml);
-				table.bindEvents.call($container,opts);
+				methods.bindEventsForTr.call($container,opts);
 				$refreshBtn.toggleClass("icon-spin").closest(".datagrid").find(".modal-backdrop").toggleClass("hide").toggleClass("in");
 				dfd.resolve(dataHtml);
-				table.refreshPagination.call($container,opts);
+				methods.refreshPagination.call($container,opts);
 			});
 			return dfd.promise();
 		},
 		getSelect:function(opts){
-			var $container = $(this);
+			var $container = $(table.selector);
 			var selectedData = [],tableData = tableDataCache[$container.selector];
 			 $("tbody tr",$container).each(function(index,tr){
 				 var $tr=$(tr); 
@@ -197,14 +206,19 @@
 		getData:function(opts){
 			var dfd = $.Deferred();
 			if(opts.data){
-				opts.total = opts.data.total;
-				dfd.resolve(opts.formatData.call(this,opts.data));
+				opts.total = opts.data.total||opts.data.length;
+				if(typeof(opts.formatData)=="function"){
+					dfd.resolve(opts.formatData.call(this,opts.data));
+				}else{
+					dfd.resolve(opts.data);
+				}
+				
 			}else{
 				$.ajax({
 					url:opts.url,
 					type:'Get',
 					dataType:'json',
-					data:$.extend({},{pageIndex:opts.pageIndex,pageSize:opts.pageSize},opts.params)
+					data:$.extend({_random:Math.random()},{pageIndex:opts.pageIndex,pageSize:opts.pageSize},opts.params)
 				}).done(function(data){
 					opts.total = data.total;
 					if($.isFunction(opts.formatData)){
@@ -220,67 +234,32 @@
 		bindEvents:function(opts){
 			var $container = $(this);
 			/**
-			**trĞĞÑ¡ÖĞÊÂ¼ş
-			**/
-			$("tbody tr",$container).bind("select",function(){
-			     if(opts.multiSelect){
-					$(this).addClass("selected").find(":checkbox").prop("checked",true);
-				}else{
-					$(this).addClass("selected").siblings().removeClass("selected");
-					$(this).find(":radio").prop("checked",true);
-				}
-			});
-
-			/**
-			**trĞĞÈ¡ÏûÑ¡ÖĞÊÂ¼ş
-			**/
-			$("tbody tr",$container).bind("unselect",function(){
-			     if(opts.multiSelect){
-					$(this).removeClass("selected").find(":checkbox").prop("checked",false);
-				}else{
-					$(this).removeClass("selected").siblings().removeClass("selected");
-					$(this).find(":radio").prop("checked",false);
-				}
-			});
-
-			/**
-			**trµã»÷ÊÂ¼ş£¬ÓÃÓÚÑ¡ÔñĞĞ»òÈ¡ÏûÑ¡ÔñĞĞ
-			**/
-			$("tbody tr",$container).click(function(){
-				if($(this).hasClass("selected")){
-					$(this).trigger("unselect");
-				}else{
-					$(this).trigger("select");
-				}
-			});
- 
-			/**
-			**·ÖÒ³°´Å¥µã»÷ÊÂ¼ş
+			**åˆ†é¡µæŒ‰é’®ç‚¹å‡»äº‹ä»¶
 			**/
 			$(".pagination-btn",$container).click(function(event){
 				switch($(this).attr("action")){
-					case "refresh": table.refresh.call($container,opts);break;
+					case "refresh": methods.refresh.call($container,opts);break;
 					case "first"  : opts.pageIndex = 1;
-								    table.refresh.call($container,opts);break;
+								    methods.refresh.call($container,opts);break;
 					case "prev"   : if(opts.pageIndex-1>0){
 										opts.pageIndex=opts.pageIndex-1;
 									}else{
 										opts.pageIndex = 1;
 									}
-					 				table.refresh.call($container,opts);break;
+					 				methods.refresh.call($container,opts);break;
 					case "next": 	if(opts.pageIndex+1>opts.pageCount){
 										opts.pageIndex=opts.pageCount;
 									}else{
 										opts.pageIndex = opts.pageIndex+1;
 									}
-									table.refresh.call($container,opts);break;
+									methods.refresh.call($container,opts);break;
 					case "last":    opts.pageIndex=opts.pageCount;
-						            table.refresh.call($container,opts);break;
+						            methods.refresh.call($container,opts);break;
 				}
 			});
 			
 			/**
-			**ÅÅĞòÊÂ¼ş
+			**æ’åºäº‹ä»¶
 			**/
 			$("thead th.sort-column",$container).click(function(){
 				var $th = $(this),
@@ -297,20 +276,21 @@
 
 				opts.params.sortName = $th.attr("data-name");
 				opts.params.sortType = $upIcon.hasClass("hide")?"desc":"asc";
-				table.refresh.call($container,opts);
+				methods.refresh.call($container,opts);
 			});
-			/**********************ÍÏ¶¯ÊÂ¼ş´¦Àí***********************************/
-			var topY,bottomY;//ÍÏ¶¯ÇøÓòµÄÉÏÏÂ±ß½ç
+			/**********************æ‹–åŠ¨äº‹ä»¶å¤„ç†***********************************/
+			var topY,bottomY;//æ‹–åŠ¨åŒºåŸŸçš„ä¸Šä¸‹è¾¹ç•Œ
 			var mouseDown = false;
-			if(opts.multiSelect){//ÔÊĞí¶àÑ¡Ê±²Å°ó¶¨ÍÏ¶¯ÊÂ¼ş
+			var _TitleWidth = 37;
+			if(opts.multiSelect){//å…è®¸å¤šé€‰æ—¶æ‰ç»‘å®šæ‹–åŠ¨äº‹ä»¶
 				$($container).mousedown(function(event){
 					mouseDown = true;
 					var x = event.pageX,y=event.pageY;
 					 $(this).mousemove(function(e){
 						 if(mouseDown){
-							 $("#area").removeClass("hide");
+							$("#area").removeClass("hide");
 							var ex = e.pageX,ey=e.pageY;
-							topY = (ey>y?y:ey)- $container.find("table").offset().top;
+							topY = (ey>y?y:ey)- $container.find("table").offset().top+_TitleWidth;
 							bottomY = topY+Math.abs(ey-y);
 
 							$("#area").css({
@@ -357,27 +337,100 @@
 			}
 			function select(){
 			   $("tbody tr",$container).each(function(index,e){
-				if($(e).offset().top-$container.find("table").offset().top+$(e).height()>=topY&&$(e).offset().top-$container.find("table").offset().top<=bottomY){
+				if($(e).offset().top-$container.find("table").offset().top+$(e).height()+_TitleWidth>=topY&&$(e).offset().top-$container.find("table").offset().top+_TitleWidth<=bottomY){
 						$(e).trigger("select");
 					}else{
 						$(e).trigger("unselect");
 					}
 			   });
 		    }
-			/**********************  /ÍÏ¶¯ÊÂ¼ş´¦Àí ***********************************/
+			/**********************  /æ‹–åŠ¨äº‹ä»¶å¤„ç† ***********************************/
+			
+			methods.bindEventsForTr.call($container,opts);
+		},
+		bindEventsForTr:function(opts){//ç»™tbody Trç»‘å®šäº‹ä»¶,è¿™æ ·åœ¨åˆ·æ–°çš„æ—¶å€™å°±å¯ä»¥åªç»™åˆ·æ–°çš„æ•°æ®ä¿®æ”¹äº‹ä»¶
+			var $container = $(this);
+			/**
+			**trè¡Œé€‰ä¸­äº‹ä»¶
+			**/
+			$("tbody tr",$container).bind("select",function(){
+			     if(opts.multiSelect){
+					$(this).addClass("selected").find(":checkbox").prop("checked",true);
+				}else{
+					$(this).addClass("selected").siblings().removeClass("selected");
+					$(this).find(":radio").prop("checked",true);
+				}
+			});
+
+			/**
+			**trè¡Œå–æ¶ˆé€‰ä¸­äº‹ä»¶
+			**/
+			$("tbody tr",$container).bind("unselect",function(){
+			     if(opts.multiSelect){
+					$(this).removeClass("selected").find(":checkbox").prop("checked",false);
+				}else{
+					$(this).removeClass("selected").siblings().removeClass("selected");
+					$(this).find(":radio").prop("checked",false);
+				}
+			});
+
+			/**
+			**trç‚¹å‡»äº‹ä»¶ï¼Œç”¨äºé€‰æ‹©è¡Œæˆ–å–æ¶ˆé€‰æ‹©è¡Œ
+			**/
+			$("tbody tr",$container).click(function(){
+				if($(this).hasClass("selected")){
+					$(this).trigger("unselect");
+				}else{
+					$(this).trigger("select");
+				}
+			});
+ 
+		},
+		renderTitle:function(opts){
+			var $div = $(document.createElement("div"));
+			var $span = $(document.createElement("span"));
+			$span.html(opts.title||'');
+			$div.addClass("table-title").append($span).append(methods.renderButtonGroup(opts));
+			return $div;
+		},
+		renderButtonGroup:function(opts){
+			var $btnDiv = $(document.createElement("div"));
+			$btnDiv.addClass("button-group");
+			$.each(opts.buttons,function(index,button){
+				var $btn = $(document.createElement("button"));
+				$btn.addClass("btn btn-small btn-link").html(button.text);
+				$btn.bind("click",function(){
+					button.click.call(table,button);
+				});
+				$btnDiv.append($btn);
+			});
+			return $btnDiv;
 		}
 	};
 
-	var tableCache = {};//ÓÃÓÚ´æ´¢±í¶ÔÏó
-	var tableDataCache = {};//ÓÃÓÚ´æ´¢±í¶ÔÏóÊı¾İ
+	/**
+	 * è¿”å›ç»™å¤–éƒ¨è°ƒç”¨
+	 */
+	var table = {
+			refresh:function(){
+				methods.refresh.call($(table.selector),table.opts);
+			},
+			getSelect:function(){
+				return methods.getSelect.call(table.selector);
+			}
+	};
+	var tableCache = {};//ç”¨äºå­˜å‚¨è¡¨å¯¹è±¡
+	var tableDataCache = {};//ç”¨äºå­˜å‚¨è¡¨å¯¹è±¡æ•°æ®
 	$.fn.table=function(opts){
 		if(typeof(opts)=="string"){
 			if(opts=="getSelect"){
-				return table.getSelect.call($(this));
+				return methods.getSelect.call($(this));
+			}else if(opts=="refresh"){
+				methods.refresh.call($(this),tableCache[$(this).selector].opts);
 			}
 		}else{
 			opts=$.extend({},defaults,opts);
-			table.renderTable.call($(this),opts);
+			return methods.renderTable.call($(this),opts);
 		}
 	};
 })();
