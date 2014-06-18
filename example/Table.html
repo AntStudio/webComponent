@@ -2,6 +2,7 @@
 <html>
  <head>
   <title> New Document </title>
+  <meta charset="utf-8">
   <meta name="Generator" content="EditPlus">
   <meta name="Author" content="">
   <meta name="Keywords" content="">
@@ -16,24 +17,24 @@
 	$(function(){
 		$("div.dynamic").table({
 		    columns:[
-			         {name:"id",render:function(rowData){return rowData.name;},width:200,display:'id(ÏŞ¿í200px)',sort:true},
-					 {name:"name",display:"È¨ÏŞÃû³Æ(¾ÓÖĞ)",align:"center",sort:true,sortName:"name"},
+			         {name:"id",render:function(rowData){return rowData.name;},width:200,display:'id(é™å®½200px)',sort:true},
+					 {name:"name",display:"æƒé™åç§°(å±…ä¸­)",align:"center",sort:true,sortName:"name"},
 					 {name:"code"},
-					 {display:'¸½¼ÓÁĞ²âÊÔ(¾ÓÓÒ)',align:"right",render:function(columnData){return "²âÊÔÄÚÈİ for "+columnData.name;}}
+					 {display:'é™„åŠ åˆ—æµ‹è¯•(å±…å³)',align:"right",render:function(columnData){return "æµ‹è¯•å†…å®¹ for "+columnData.name;}}
 					 ],
 			data:{total:4,
 			  rows:[
-					{"id":1,"name":"·ÖÅä²Ëµ¥","code":"000002"},
-			        {"id":3,"name":"ÓÃ»§ÁĞ±í","code":"000008"},
-					{"id":4,"name":"ÓÃ»§ÁĞ±í","code":"00000d"},
-					{"id":5,"name":"Ìí¼Ó²Ëµ¥ĞÅÏ¢","code":"000001"}
+					{"id":1,"name":"åˆ†é…èœå•","code":"000002"},
+			        {"id":3,"name":"ç”¨æˆ·åˆ—è¡¨","code":"000008"},
+					{"id":4,"name":"ç”¨æˆ·åˆ—è¡¨","code":"00000d"},
+					{"id":5,"name":"æ·»åŠ èœå•ä¿¡æ¯","code":"000001"}
 					]
 			 },
 			 formatData:function(data){return data.rows;}
 		 });
 
 		 $(".get-select").click(function(){
-			alert("Ò»¹²Ñ¡ÔñÁË "+$("div.dynamic").table("getSelect").length+"ĞĞ");
+			alert("ä¸€å…±é€‰æ‹©äº† "+$("div.dynamic").table("getSelect").length+"è¡Œ");
 		 });
 	});
   </script>
@@ -45,74 +46,74 @@
  </head>
 
  <body>
- <h3>¾²Ì¬Ê¾Àı</h3>
+ <h3>é™æ€ç¤ºä¾‹</h3>
 	<div class="datagrid">
 		<table class="table table-bordered table-hover">
 		<thead>
 			<tr>
-				<th>±íÍ·1</th>
-				<th>±íÍ·2</th>
-				<th>±íÍ·3</th>
-				<th>±íÍ·4</th>
-				<th>±íÍ·5</th>
+				<th>è¡¨å¤´1</th>
+				<th>è¡¨å¤´2</th>
+				<th>è¡¨å¤´3</th>
+				<th>è¡¨å¤´4</th>
+				<th>è¡¨å¤´5</th>
 			</tr>
 			</thead>
 			<tbody class="loading-modal">
 			<tr>
-				<td>Êı¾İ1</td>
-				<td>Êı¾İ2</td>
-				<td>Êı¾İ3</td>
-				<td>Êı¾İ4</td>
-				<td>Êı¾İ5</td>
+				<td>æ•°æ®1</td>
+				<td>æ•°æ®2</td>
+				<td>æ•°æ®3</td>
+				<td>æ•°æ®4</td>
+				<td>æ•°æ®5</td>
 			</tr>
 			<tr>
-				<td>Êı¾İ1</td>
-				<td>Êı¾İ2</td>
-				<td>Êı¾İ3</td>
-				<td>Êı¾İ4</td>
-				<td>Êı¾İ5</td>
+				<td>æ•°æ®1</td>
+				<td>æ•°æ®2</td>
+				<td>æ•°æ®3</td>
+				<td>æ•°æ®4</td>
+				<td>æ•°æ®5</td>
 			</tr>
 			<tr>
-				<td>Êı¾İ1</td>
-				<td>Êı¾İ2</td>
-				<td>Êı¾İ3</td>
-				<td>Êı¾İ4</td>
-				<td>Êı¾İ5</td>
+				<td>æ•°æ®1</td>
+				<td>æ•°æ®2</td>
+				<td>æ•°æ®3</td>
+				<td>æ•°æ®4</td>
+				<td>æ•°æ®5</td>
 			</tr>
 			<tr>
-				<td>Êı¾İ1</td>
-				<td>Êı¾İ2</td>
-				<td>Êı¾İ3</td>
-				<td>Êı¾İ4</td>
-				<td>Êı¾İ5</td>
+				<td>æ•°æ®1</td>
+				<td>æ•°æ®2</td>
+				<td>æ•°æ®3</td>
+				<td>æ•°æ®4</td>
+				<td>æ•°æ®5</td>
 			</tr>
 			<tr>
-				<td>Êı¾İ1</td>
-				<td>Êı¾İ2</td>
-				<td>Êı¾İ3</td>
-				<td>Êı¾İ4</td>
-				<td>Êı¾İ5</td>
+				<td>æ•°æ®1</td>
+				<td>æ•°æ®2</td>
+				<td>æ•°æ®3</td>
+				<td>æ•°æ®4</td>
+				<td>æ•°æ®5</td>
 			</tr>
 			<tr>
-				<td>Êı¾İ1</td>
-				<td>Êı¾İ2</td>
-				<td>Êı¾İ3</td>
-				<td>Êı¾İ4</td>
-				<td>Êı¾İ5</td>
+				<td>æ•°æ®1</td>
+				<td>æ•°æ®2</td>
+				<td>æ•°æ®3</td>
+				<td>æ•°æ®4</td>
+				<td>æ•°æ®5</td>
 			</tr>
 			<tr>
-				<td>Êı¾İ1</td>
-				<td>Êı¾İ2</td>
-				<td>Êı¾İ3</td>
-				<td>Êı¾İ4</td>
-				<td>Êı¾İ5</td>
+				<td>æ•°æ®1</td>
+				<td>æ•°æ®2</td>
+				<td>æ•°æ®3</td>
+				<td>æ•°æ®4</td>
+				<td>æ•°æ®5</td>
 			</tr>
 			<tr>
-				<td>Êı¾İ1</td>
-				<td>Êı¾İ2</td>
-				<td>Êı¾İ3</td>
-				<td>Êı¾İ4</td>
-				<td>Êı¾İ5</td>
+				<td>æ•°æ®1</td>
+				<td>æ•°æ®2</td>
+				<td>æ•°æ®3</td>
+				<td>æ•°æ®4</td>
+				<td>æ•°æ®5</td>
 			</tr>
 			</tbody>
 		</table>
@@ -126,10 +127,10 @@
 		   <span class="split"></span>
 		   <span class=" pagination-btn"> <i class="icon-refresh"></i></span><!-- icon-spin-->
 		   <div class="data-info">
-			   <span>µ±Ç°ÏÔÊ¾</span>
+			   <span>å½“å‰æ˜¾ç¤º</span>
 			   <span>1~10</span>
-			   <span>Ìõ,¹²</span>
-			   <span>24Ìõ¼ÇÂ¼</span>
+			   <span>æ¡,å…±</span>
+			   <span>24æ¡è®°å½•</span>
 		   </div>
 		</div>
 		<div class="modal-backdrop fade hide">
@@ -138,9 +139,9 @@
 	</div>
 
 
-	<h3>¶¯Ì¬Ê¾Àı</h3>
+	<h3>åŠ¨æ€ç¤ºä¾‹</h3>
 		<div class="dynamic" >
 		</div>
-		<div><a class="btn btn-primary btn-block btn-large get-select">»ñÈ¡Ñ¡ÔñĞĞ</a></div>
+		<div><a class="btn btn-primary btn-block btn-large get-select">è·å–é€‰æ‹©è¡Œ</a></div>
  </body>
 </html>

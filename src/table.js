@@ -20,52 +20,68 @@
 		multiSelect:true,//是否允许多选
 		showNumber:true,//是否显示序号(从1开始计数)
 		buttons:[],
-		emptyParent:true//是否清空容器
+		emptyParent:true,//是否清空容器
+		dragSelect:false
 	};
 
 	var methods  = {
+		//渲染数据
 		renderData:function(opts){
 			var $container = this;
 			var getData = methods.getData.call(this,opts);
 			var dfd = $.Deferred();
 			getData.done(function(data){
 				opts.currentDataSize = data.length;
-				var dataHtml="<tbody>";
+				var $tbody = methods.ce("tbody");
 				tableDataCache[$container.selector]=data;
 				$.each(data,function(index,columnData){
-					dataHtml+="<tr data-number=\""+(index)+"\" data-id=\"tr_"+columnData[(opts.rowId||{})]+"\"";//data-number表示当前行的序号,用户获取选择行使用,从0开始计数
+					var $tr = methods.ce("tr",{"data-number":index,"data-id":"tr_"+columnData[(opts.rowId||{})]});//data-number表示当前行的序号,用户获取选择行使用,从0开始计数
 					if(columnData.checked){//是否选中
-						dataHtml+=" class=\"selected\" ";
+						$tr.addClass("selected");
 					}
-					dataHtml+=">";
+					
 					if(opts.showNumber){//处理序号列
-						dataHtml+="<td class=\"number\">"+(index+1)+"</td>";
+						var $seriesTd = methods.ce("td",{"class":"number"}).html(index+1);
+						$tr.append($seriesTd);
 					}
+
 					if(opts.showSelectBox){//处理单选框或复选框
-						dataHtml+="<td><input name=\"selectBox\" type=\""+(opts.multiSelect?"checkbox":"radio")+"\"/></td>";
+						var $selectTd = methods.ce("td");
+						var $selectBox = methods.ce("input",{"name":"selectBox","type":(opts.multiSelect?"checkbox":"radio")});
+						$selectTd.append($selectBox);
+						$tr.append($selectTd);
 					}
-					$.each(opts.columns,function(index,columnDefinition){
+
+					$.each(opts.columns,function(index,columnDefinition){//处理数据行
+						var $dataTd = methods.ce("td",{"style":"text-align:"+(columnDefinition.align||"left")+";"});//文字默认左对齐
 						if($.isFunction(columnDefinition.render)){
-							dataHtml+="<td  style=\"text-align:"+(columnDefinition.align||"left")+"\">"+columnDefinition.render(columnData)+"</td>";
+							$dataTd.html(columnDefinition.render.call($dataTd,columnData));//如果有自定义渲染方法，则调用自定义渲染方法
 						}else{
-						    dataHtml+="<td  style=\"text-align:"+(columnDefinition.align||"left")+"\">"+columnData[columnDefinition.name]+"</td>";
+							$dataTd.html(columnData[columnDefinition.name]);//没有自定义渲染方法，默认通过column.name取值
 						}
+						$tr.append($dataTd);
 					});
-					dataHtml+="</tr>";
+					$tbody.append($tr);
 				});
-				 dataHtml+="</tbody>";
-				dfd.resolve(dataHtml);
+				dfd.resolve($tbody);
 			});
 
 			return dfd.promise();
 		},
+		//渲染表头
 		renderHeader:function(opts){
-			var header = "<thead><tr>";
+			var $thead=methods.ce("thead");
+			var $tr = methods.ce("tr");
 			if(opts.showNumber){
-			    header+="<th class=\"number\"></th>";
+				var $numberTh = methods.ce("th",{"class":"number"});
+				$tr.append($numberTh);
 			}
 			if(opts.showSelectBox){
-				header+="<th class=\"select-box\">"+(opts.multiSelect?"<input type=\"checkbox\"/>":"")+"</th>";
+				var $selectTh = methods.ce("th",{"class":"select-box"});
+				if(opts.multiSelect){
+					$selectTh.append(methods.ce("input",{"type":"checkbox"}));
+				}
+				$tr.append($selectTh);
 			}
 			$.each(opts.columns,function(index,column){
 				if(column.width){
@@ -73,14 +89,16 @@
 						column.width +="px";
 					}
 				}
-				header+="<th data-name=\""+(column.sortName||column.name)+"\" class=\""+(column.sort?"sort-column":"")+"\" style=\"text-align:"+(column.align||"left")+"; width:"+(column.width||"auto")+";\">"+(column.display||column.name);
+				var $dataTh = methods.ce("th",{"data-name":(column.sortName||column.name),"class":(column.sort?"sort-column":""),"style":"text-align:"+(column.align||"left")+"; width:"+(column.width||"auto")+";"})
+				$dataTh.append((column.display||column.name));				
 				if(column.sort){
-					header+="<i class=\"icon-angle-down  transparent\"></i> <i class=\"icon-angle-up hide\"></i> ";
+					$dataTh.append(methods.ce("i",{"class":"fa fa-angle-down  transparent"}))
+						   .append(methods.ce("i",{"class":"fa fa-angle-up hide"}));
 				}
-				header+="</th>";
+				$tr.append($dataTh);
 			});
-			header+="</tr></thead>";
-			return header;
+			$thead.append($tr);
+			return $thead;
 		},
 		renderTable:function(opts){
 			var $container = this;
@@ -94,26 +112,31 @@
 			if(!table.autoLayout){
 				$tableDiv.addClass("fixed-layout");
 			}
-			var tableHtml = "";
-			tableHtml+="<div class=\"table-container\"><table class=\"table table-bordered table-hover\">";
-			tableHtml+=methods.renderHeader(opts);
+			
+			var $tableContainerDiv = $(document.createElement("div"));
+			$tableContainerDiv.addClass("table-container");
+			var $table = $(document.createElement("table"));
+			$table.append(methods.renderHeader(opts));
+			$table.addClass("table table-bordered table-hover");
+			
 			var renderTableDfd = $.Deferred();
 			methods.renderData.call($container,opts).done(function(tbody){
-				tableHtml+=tbody;
+				$table.append(tbody);
 				renderTableDfd.resolve();
 			});
 			
 			$.when(renderTableDfd).done(function(){
-				tableHtml+="</table></div>";
-				tableHtml+=methods.renderPagination(opts);
-				tableHtml+=methods.renderModal();
-				tableHtml+=methods.renderSelection();
-				tableHtml+="</div>";
 				if(opts.emptyParent){
-					$container.html($tableDiv.append($(tableHtml)));
-				}else{
-					$container.append($tableDiv.append($(tableHtml)));
+					$container.empty();
 				}
+				$tableContainerDiv.append($table);
+				$tableDiv.append($tableContainerDiv)
+				$tableDiv.append(methods.renderPagination(opts));
+				$tableDiv.append(methods.renderModal());
+				$tableDiv.append(methods.renderSelection());
+				
+				$container.append($tableDiv);
+				
 				tableCache[$container.selector] = table;
 				methods.bindEvents.call($container,opts);
 			});
@@ -126,32 +149,35 @@
 			var pageCount = Math.ceil((opts.total||1)/opts.pageSize);
 			opts.pageCount = pageCount||1;
 
-			var paginationHtml = "<div class=\"grid-pagination\">"
-		   +"<span class=\"pagination-btn\" action=\"first\"> <i class=\"icon-step-backward\"></i></span>"
-		   +"<span class=\"pagination-btn\" action=\"prev\"> <i class=\"icon-play icon-prev\"></i></span>"
-		   +"<input type=\"text\" name=\"currentPage\" class=\"input-small\" value=\"" 
-		   +(opts.pageIndex||1)
-		   +"\"/>/"
-		   +"<span class=\"pagecount\">"
-		   +pageCount
-		   +"</span>"
-		   +"<span class=\"pagination-btn\" action=\"next\"> <i class=\"icon-play\"></i></span>"
-		   +"<span class=\"pagination-btn\" action=\"last\"> <i class=\"icon-step-forward\"></i></span>"
-		   +"<span class=\"split\"></span>"
-		   +"<span class=\"pagination-btn\" action=\"refresh\"> <i class=\"icon-refresh\"></i></span><!-- icon-spin-->"
-		   +"<div class=\"data-info\">"
-		   +"<span>当前显示</span>"
-		   +"<span class=\"current-data-info\">"+startIndex
-		   +"~"
-		   +endIndex
-		   +"</span>"
-		   +"<span>条,共</span>"
-		   +"<span class=\"total\">" 
-		   +(opts.total||0)
-		   +"</span>条记录"
-		   +"</div>"
-		   +"</div>";
-		   return paginationHtml;
+			var $paginationDiv = methods.ce("div",{"class":"grid-pagination"});
+			
+		
+			$paginationDiv.append(	methods.ce("span",{"class":"pagination-btn",action:"first"}).append(methods.ce("i",{"class":"fa fa-step-backward"})));
+			$paginationDiv.append(	methods.ce("span",{"class":"pagination-btn",action:"prev"}).append(methods.ce("i",{"class":"fa fa-play fa-rotate-180"})));
+			$paginationDiv.append(	methods.ce("input",{"class":"input-small",type:"text",name:"currentPage",value:(opts.pageIndex||1)}));
+			$paginationDiv.append("/");
+			$paginationDiv.append(methods.ce("span",{"class":"pagecount"}).html(pageCount));
+			$paginationDiv.append(	methods.ce("span",{"class":"pagination-btn",action:"next"}).append(methods.ce("i",{"class":"fa fa-play"})));
+			$paginationDiv.append(	methods.ce("span",{"class":"pagination-btn",action:"last"}).append(methods.ce("i",{"class":"fa fa-step-forward"})));
+			$paginationDiv.append(	methods.ce("span",{"class":"split"}));
+			$paginationDiv.append(	methods.ce("span",{"class":"pagination-btn",action:"refresh"}).append(methods.ce("i",{"class":"fa fa-refresh"})));
+			
+			var $dataInfo = methods.ce("div",{"class":"data-info"});
+			$dataInfo.append(	methods.ce("span").html("当前显示"));
+			$dataInfo.append(	methods.ce("span",{"class":"current-data-info"}).html(startIndex+"~"+endIndex));
+			$dataInfo.append(	methods.ce("span").html("条,共"));
+			$dataInfo.append(	methods.ce("span",{"class":"total"}).html((opts.total||0)));
+			$dataInfo.append("条记录");
+			
+			$paginationDiv.append($dataInfo);
+			return $paginationDiv;
+		},
+		ce:function(tag,opts){
+			var $tag = $(document.createElement(tag));
+			for(var name in opts){
+				$tag.attr(name,opts[name]);
+			}
+			return $tag;
 		},
 		refreshPagination:function(opts){
 			var $pagination = $(".grid-pagination",this);
@@ -165,7 +191,7 @@
 			$pagination.find(".total").html(opts.total||0);
 		},
 		renderModal:function(){
-			return "<div class=\"modal-backdrop fade hide\"><span> <i class=\"icon-spinner icon-spin\"></i>Loading...</span></div>";
+			return "<div class=\"modal-backdrop fade hide\"><span> <i class=\"fa fa-spinner fa-spin\"></i>Loading...</span></div>";
 		},
 	    renderSelection:function(){
 			return "<div style=\"position: absolute;border: 1px dashed #91B4F1;background:rgba(185, 213, 241, 0.7);\" id=\"area\"></div>";
@@ -173,8 +199,8 @@
 		refresh:function(opts){
 			var $container = this;
 			var dfd = $.Deferred();
-			var $refreshBtn = $(".pagination-btn .icon-refresh");
-			$refreshBtn.toggleClass("icon-spin").closest(".datagrid").find(".modal-backdrop").toggleClass("hide").toggleClass("in");
+			var $refreshBtn = $(".pagination-btn .fa-refresh");
+			$refreshBtn.toggleClass("fa-spin").closest(".datagrid").find(".modal-backdrop").toggleClass("hide").toggleClass("in");
 
 			
 			methods.getData.call(this,opts).done(function(data){
@@ -204,7 +230,7 @@
 				});
 				$("table tbody",$container).html(dataHtml);
 				methods.bindEventsForTr.call($container,opts);
-				$refreshBtn.toggleClass("icon-spin").closest(".datagrid").find(".modal-backdrop").toggleClass("hide").toggleClass("in");
+				$refreshBtn.toggleClass("fa-spin").closest(".datagrid").find(".modal-backdrop").toggleClass("hide").toggleClass("in");
 				dfd.resolve(dataHtml);
 				methods.refreshPagination.call($container,opts);
 			});
@@ -252,7 +278,7 @@
 					dataType:'json',
 					data:$.extend({_random:Math.random()},{pageIndex:opts.pageIndex,pageSize:opts.pageSize},opts.params)
 				}).done(function(data){
-					opts.total = data.total||data.length;
+					opts.total = data.total||data.totalItemCount;
 					if($.isFunction(opts.formatData)){
 						data = opts.formatData.call(this,data);
 					}
@@ -295,9 +321,9 @@
 			**/
 			$("thead th.sort-column",$container).click(function(){
 				var $th = $(this),
-				$downIcon = $th.find(".icon-angle-down"),
-				$upIcon = $th.find(".icon-angle-up");
-				$("thead th.sort-column",$container).not($th).find(".icon-angle-down").addClass("transparent").next().addClass("hide");
+				$downIcon = $th.find(".fa-angle-down"),
+				$upIcon = $th.find(".fa-angle-up");
+				$("thead th.sort-column",$container).not($th).find(".fa-angle-down").addClass("transparent").next().addClass("hide");
 
 				if($downIcon.hasClass("hide")&&$upIcon.hasClass("hide")){
 					$upIcon.removeClass("hide");
@@ -313,21 +339,21 @@
 			/**********************拖动事件处理***********************************/
 			var topY,bottomY;//拖动区域的上下边界
 			var mouseDown = false;
-			var _TitleWidth = 37;
-			if(opts.multiSelect){//允许多选时才绑定拖动事件
-				$($container).mousedown(function(event){
+			var _TitleWidth = 37+36;
+			if(opts.multiSelect&&opts.dragSelect){//允许多选时才绑定拖动事件
+				$("tbody",$container).mousedown(function(event){
 					mouseDown = true;
 					var x = event.pageX,y=event.pageY;
-					 $(this).mousemove(function(e){
+					 $($container).mousemove(function(e){
 						 if(mouseDown){
 							$("#area").removeClass("hide");
 							var ex = e.pageX,ey=e.pageY;
-							topY = (ey>y?y:ey)- $container.find("table").offset().top+_TitleWidth;
+							topY = (ey>y?y:ey)- $container.find("tbody").offset().top+_TitleWidth;
 							bottomY = topY+Math.abs(ey-y);
-
+							
 							$("#area").css({
 								top:topY,
-								left:(ex>x?x:ex)-$container.find("table").offset().left,
+								left:(ex>x?x:ex)-$container.find("tbody").offset().left,
 								width:Math.abs(ex-x),
 								height:Math.abs(ey-y)
 							});
@@ -369,7 +395,7 @@
 			}
 			function select(){
 			   $("tbody tr",$container).each(function(index,e){
-				if($(e).offset().top-$container.find("table").offset().top+$(e).height()+_TitleWidth>=topY&&$(e).offset().top-$container.find("table").offset().top+_TitleWidth<=bottomY){
+				if($(e).offset().top-$container.find("tbody").offset().top+$(e).height()+_TitleWidth>=topY&&$(e).offset().top-$container.find("tbody").offset().top+_TitleWidth<=bottomY){
 						$(e).trigger("select");
 					}else{
 						$(e).trigger("unselect");
