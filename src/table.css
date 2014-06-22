@@ -1,50 +1,48 @@
 .datagrid{
 	position:relative;
 }
-.datagrid>table{
+.datagrid table{
 	margin-bottom:0;
 }
 
-.datagrid>table>thead th.number{
+.datagrid th.number{
 	width:25px;
 }
 
-.datagrid>table>thead th [class^="icon-"]{
+.datagrid th [class^="fa-"]{
 	float: right;
 	font-size: 20px;
 	color: #8D8989;
 }
 
-.datagrid>table>thead th .transparent{
-	opacity:0;
-}
-
- 
-.datagrid>table>thead th.sort-column{
+.datagrid th.sort-column{
 	cursor:pointer;
 }
 
-.datagrid>table>tbody td.number{
+.datagrid .sort-column .hide{
+	display:none;
+}
+.datagrid tbody td.number{
 	text-align:center;
 }
 
-.datagrid>.grid-pagination{
+.datagrid .grid-pagination{
 	padding: 5px;
 }
-.datagrid>.grid-pagination .data-info{
+.datagrid .grid-pagination .data-info{
 	display:inline;
 	float:right;
 	line-height: 30px;
 }
 
-.datagrid>.grid-pagination .input-small{
+.datagrid .grid-pagination .input-small{
 	width: 30px;
 	margin-bottom:0;
 	border-width:1px;
 	border-color:rgb(204, 204, 204);
 }
 
-.datagrid>.grid-pagination .input-small:focus{
+.datagrid .grid-pagination .input-small:focus{
 		border-color: rgba(82,168,236,0.8);
 }
 
@@ -62,7 +60,7 @@
 	padding: 5px 10px;
 }
 
-.btn [class^="icon-"]{
+.btn [class^="fa-"]{
 	width:8px;
 	display:inline-block;
 }
