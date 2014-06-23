@@ -21,7 +21,7 @@
 		showNumber:true,//是否显示序号(从1开始计数)
 		buttons:[],
 		emptyParent:true,//是否清空容器
-		dragSelect:false
+		dragSelect:true
 	};
 
 	var methods  = {
@@ -183,7 +183,8 @@
 			return "<div class=\"modal-backdrop fade hide\"><span> <i class=\"fa fa-spinner fa-spin\"></i>Loading...</span></div>";
 		},
 	    renderSelection:function(){
-			return "<div style=\"position: absolute;border: 1px dashed #91B4F1;background:rgba(185, 213, 241, 0.7);\" id=\"area\"></div>";
+			var tableInstance = this;
+			return "<div class=\"drag-area hide\" id=\"_datagrid_area_"+tableInstance._id+"\"></div>";
 	    },
 		//刷新
 		refresh:function(){
@@ -202,6 +203,7 @@
 				$table.append(tbody);
 				$refreshBtn.toggleClass("fa-spin").closest(".datagrid").find(".modal-backdrop").toggleClass("hide").toggleClass("in");//关闭loading状态
 				methods.bindEventsForTr.call(tableInstance);//为tbody添加事件
+				methods.bindEventsForDragArea.call(tableInstance);
 				methods.refreshPagination.call(tableInstance);//刷新分页			
 			});
 			
@@ -338,7 +340,16 @@
 				opts.params.sortType = $upIcon.hasClass("hide")?"desc":"asc";
 				methods.refresh.call(tableInstance);
 			});
-			/**********************拖动事件处理***********************************/
+			
+			methods.bindEventsForDragArea.call(tableInstance);
+			methods.bindEventsForTr.call(tableInstance);
+		},
+		bindEventsForDragArea:function(){
+			var tableInstance = this;
+			var opts = tableInstance.opts;
+			var $container = tableInstance.$container;
+		/**********************拖动事件处理***********************************/
+			var areaSelector = "#_datagrid_area_"+tableInstance._id;
 			var topY,bottomY;//拖动区域的上下边界
 			var mouseDown = false;
 			var _TitleWidth = 37+36;
@@ -348,12 +359,12 @@
 					var x = event.pageX,y=event.pageY;
 					 $($container).mousemove(function(e){
 						 if(mouseDown){
-							$("#area").removeClass("hide");
+							$(areaSelector).removeClass("hide");
 							var ex = e.pageX,ey=e.pageY;
 							topY = (ey>y?y:ey)- $container.find("tbody").offset().top+_TitleWidth;
 							bottomY = topY+Math.abs(ey-y);
 							
-							$("#area").css({
+							$(areaSelector).css({
 								top:topY,
 								left:(ex>x?x:ex)-$container.find("tbody").offset().left,
 								width:Math.abs(ex-x),
@@ -364,15 +375,15 @@
 							e.preventDefault();
 						 }
 					 });
-					 $("#area").mousemove(function(e1){
+					 $(areaSelector).mousemove(function(e1){
 						 if(mouseDown){
-							 $("#area").removeClass("hide");
+							 $(areaSelector).removeClass("hide");
 							var ex1 = e1.pageX,ey1=e1.pageY;
 
 							topY = (ey1>y?y:ey1)- $container.find("table").offset().top;
 							bottomY = topY+Math.abs(ey1-y);
 
-							$("#area").css({
+							$(areaSelector).css({
 								top:topY,
 								left: (ex1>x?x:ex1)-$container.find("table").offset().left,
 								width:Math.abs(ex1-x),
@@ -384,14 +395,14 @@
 						 });
 					 event.preventDefault();
 				});
-				 $("#area").mouseup(function(){
-					$("#area").css({width:0,height:0}).addClass("hide");
+				 $(areaSelector).mouseup(function(){
+					$(areaSelector).css({width:0,height:0}).addClass("hide");
 					 mouseDown = false;
 				 });
 
 				$($container).mouseup(function(){
 					$(this).unbind("mousemove");
-					$("#area").css({width:0,height:0}).addClass("hide");
+					$(areaSelector).css({width:0,height:0}).addClass("hide");
 					mouseDown = false;
 				});
 			}
@@ -405,8 +416,6 @@
 			   });
 		    }
 			/**********************  /拖动事件处理 ***********************************/
-			
-			methods.bindEventsForTr.call(tableInstance);
 		},
 		bindEventsForTr:function(){//给tbody Tr绑定事件,这样在刷新的时候就可以只给刷新的数据修改事件
 			var tableInstance = this;
@@ -496,13 +505,21 @@
 				t.getChangedRows = function(){
 					return methods.getChangedRows.call(t);
 				}
+				t._id = idGenerator.next();
 				return t;
 			}
 			
 	};
+	var _idGenerator = function(){
+		var i = 1;
+		this.next=function(){
+			return i++;
+		}
+	};
+	var idGenerator = new _idGenerator();
 	var tableCache = {};//用于存储表对象
 	var tableDataCache = {};//用于存储表对象数据
-
+	
 	$.fn.table=function(opts){
 		var tableInstance ;
 		if(typeof(opts)=="string"){
