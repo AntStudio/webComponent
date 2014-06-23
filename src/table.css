@@ -1,8 +1,17 @@
 .datagrid{
 	position:relative;
+	height: 100%;
 }
-.datagrid table{
-	margin-bottom:0;
+.datagrid>.table-title{
+  background: #F1F1F1;
+  height: 37px;
+  font-weight: bold;
+  line-height: 37px;
+  font-size: 20px;
+  padding-left: 10px;
+}
+.datagrid .table-container>table{
+	margin-bottom: 0px;
 }
 
 .datagrid th.number{
@@ -15,34 +24,39 @@
 	color: #8D8989;
 }
 
+.datagrid th .transparent{
+	opacity:0;
+}
+
 .datagrid th.sort-column{
 	cursor:pointer;
 }
 
-.datagrid .sort-column .hide{
+.datagrid th.sort-column .hide{
 	display:none;
 }
-.datagrid tbody td.number{
+
+.datagrid td.number{
 	text-align:center;
 }
 
-.datagrid .grid-pagination{
+.datagrid>.grid-pagination{
 	padding: 5px;
 }
-.datagrid .grid-pagination .data-info{
+.datagrid>.grid-pagination .data-info{
 	display:inline;
 	float:right;
 	line-height: 30px;
 }
 
-.datagrid .grid-pagination .input-small{
+.datagrid>.grid-pagination .input-small{
 	width: 30px;
 	margin-bottom:0;
 	border-width:1px;
 	border-color:rgb(204, 204, 204);
 }
 
-.datagrid .grid-pagination .input-small:focus{
+.datagrid>.grid-pagination .input-small:focus{
 		border-color: rgba(82,168,236,0.8);
 }
 
@@ -56,15 +70,6 @@
 	display: inline-block;
 }
 
- .btn{
-	padding: 5px 10px;
-}
-
-.btn [class^="fa-"]{
-	width:8px;
-	display:inline-block;
-}
-
 .datagrid .table-bordered{
 	 border-bottom-left-radius: 0px;
 	 border-bottom-right-radius:0px;
@@ -73,11 +78,11 @@
 	 border-bottom-left-radius: 0px;
 }
 .grid-pagination{
+  background: #ECECEC;
 	border: 1px solid #ddd;
 	border-top:none;
 	border-bottom-left-radius: 4px;
 	border-bottom-right-radius:4px;
-	..background:#EDF3F2;
 }
 
 .grid-pagination .split{
@@ -128,4 +133,30 @@
 
 .datagrid .table tr>th.select-box{
 	width:15px;
+}
+
+.datagrid .button-group{
+  float:right;
+}
+
+.datagrid .button-group button{
+  line-height: 29px;
+}
+
+/**
+ *   ¹Ì¶¨²¼¾Ö
+ */
+.datagrid.fixed-layout .grid-pagination{
+    position: absolute;
+    bottom: 0;
+    width:100%;
+    box-sizing: border-box;
+}
+
+.datagrid.fixed-layout .table-container{
+  position: absolute;
+  width: 100%;
+  bottom: 41px;
+  top: 37px;
+  overflow-y: auto;
 }
