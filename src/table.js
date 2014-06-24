@@ -295,6 +295,16 @@
 			var tableInstance = this;
 			var $container = tableInstance.$container;
 			var opts = tableInstance.opts;
+			//表头复选框事件
+			if(opts.multiSelect&&opts.showSelectBox){
+				$("th.select-box :checkbox",$container).click(function(){
+					if($(this).prop("checked")){
+						$("td :checkbox[name='selectBox']",$container).trigger("select");
+					}else{
+						$("td :checkbox[name='selectBox']",$container).trigger("unselect");
+					}
+				});
+			}
 			/**
 			**分页按钮点击事件
 			**/
@@ -421,12 +431,16 @@
 			var tableInstance = this;
 			var $container = tableInstance.$container;
 			var opts = tableInstance.opts;
+			var checkboxNumber = $("td :checkbox[name='selectBox']",$container).length;
 			/**
 			**tr行选中事件
 			**/
 			$("tbody tr",$container).bind("select",function(){
 			     if(opts.multiSelect){
 					$(this).addClass("selected").find(":checkbox").prop("checked",true);
+					if(opts.showSelectBox&&checkboxNumber==$("td :checkbox[name='selectBox']:checked",$container).length){
+						$("th.select-box :checkbox",$container).prop("checked",true);
+					}
 				}else{
 					$(this).addClass("selected").siblings().removeClass("selected");
 					$(this).find(":radio").prop("checked",true);
@@ -439,6 +453,9 @@
 			$("tbody tr",$container).bind("unselect",function(){
 			     if(opts.multiSelect){
 					$(this).removeClass("selected").find(":checkbox").prop("checked",false);
+					if(opts.showSelectBox){
+						$("th.select-box :checkbox",$container).prop("checked",false);
+					}
 				}else{
 					$(this).removeClass("selected").siblings().removeClass("selected");
 					$(this).find(":radio").prop("checked",false);
@@ -455,6 +472,7 @@
 					$(this).trigger("select");
 				}
 			});
+
 		},
 		//表格标题
 		renderTitle:function(){

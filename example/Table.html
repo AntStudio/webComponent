@@ -16,7 +16,7 @@
   <link href="../src/table.css" rel="stylesheet">
   <script>
 	$(function(){
-		$("div.simpleTable").table({
+		$("div.SimpleTable").table({
 			columns:[
 					{name:"id"},
 					{name:"name"},
@@ -31,10 +31,50 @@
 					]
 			},
 			formatData:function(data){return data.rows;},
-			title: "simpleTable"
+			title: "SimpleTable"
 		});
 		
-		$("div.renderTableStyle").table({
+		$("div.ShowSelectBoxTable").table({
+			columns:[
+					{name:"id"},
+					{name:"name"},
+					{name:"code"}
+					],
+			data:{
+				total:"3",
+				rows:[
+					{"id":1,"name":"系统设置","code":"000001"},
+					{"id":2,"name":"菜单管理","code":"000002"},
+					{"id":3,"name":"菜单信息","code":"000003"}
+					]
+			},
+			multiSelect:true,
+			showSelectBox:true,
+			formatData:function(data){return data.rows;},
+			title: "ShowSelectBoxTable"
+		});
+
+		$("div.ShowMultiSelectBoxTable").table({
+			columns:[
+					{name:"id"},
+					{name:"name"},
+					{name:"code"}
+					],
+			data:{
+				total:"3",
+				rows:[
+					{"id":1,"name":"系统设置","code":"000001"},
+					{"id":2,"name":"菜单管理","code":"000002"},
+					{"id":3,"name":"菜单信息","code":"000003"}
+					]
+			},
+			multiSelect:false,
+			showSelectBox:true,
+			formatData:function(data){return data.rows;},
+			title: "ShowMultiSelectBoxTable"
+		});
+
+		$("div.RenderTableStyleTable").table({
 			columns:[
 					{name:"id",display:'id(限宽200px)',width:200,},
 					{name:"name",display:"权限名称(居中)",align:"center"},
@@ -49,10 +89,10 @@
 					]
 			},
 			formatData:function(data){return data.rows;},
-			title: "renderTableStyle"
+			title: "RenderTableStyleTable"
 		});
 
-		$("div.renderTableDataSort").table({
+		$("div.RenderDataSortTable").table({
 			columns:[
 					{name:"id",width:200,display:'id(限宽200px)',render:function(rowData){return rowData.name;},sort:true},
 					{name:"name",display:"权限名称(居中)",align:"center",sort:true,sortName:"name"},
@@ -68,10 +108,10 @@
 					]
 			},
 			formatData:function(data){return data.rows;},
-			title: "renderTableDataSort"
+			title: "RenderDataSortTable"
 		});
 
-		$("div.customButton").table({
+		$("div.CustomButtonTable").table({
 			columns:[
 					{name:"id",render:function(rowData){return rowData.name;},width:200,display:'id(限宽200px)',sort:true},
 					{name:"name",display:"权限名称(居中)",align:"center",sort:true,sortName:"name"},
@@ -90,7 +130,7 @@
 					]
 			},
 			formatData:function(data){return data.rows;},
-			title: "customButton",
+			title: "CustomButtonTable",
 			buttons:[
 					{
 					text : "统计选中行数",//按钮文字
@@ -128,11 +168,11 @@
 
  <body>
  	<h3>最简单的表格</h3>
- 		<div  class="simpleTable" ></div>
+ 		<div  class="SimpleTable" ></div>
  		<div>
 			<h3>代码</h3>
 			<pre class="line-numbers"><code class="language-javascript">
-$("div.simpleTable").table({
+$("div.SimpleTable").table({
 	columns:[
 			{name:"id"},
 			{name:"name"},
@@ -147,12 +187,65 @@ $("div.simpleTable").table({
 			]
 	},
 	formatData:function(data){return data.rows;},
-	title: "simpleTable"
+	title: "SimpleTable"
 });</code>	</pre>
 		</div>
 
+<h3>显示行的选择框，并允许多选</h3>
+ 		<div  class="ShowSelectBoxTable" ></div>
+ 		<div>
+			<h3>代码</h3>
+			<pre class="line-numbers"><code class="language-javascript">
+$("div.ShowSelectBoxTable").table({
+	columns:[
+			{name:"id"},
+			{name:"name"},
+			{name:"code"}
+			],
+	data:{
+		total:"3",
+		rows:[
+			{"id":1,"name":"系统设置","code":"000001"},
+			{"id":2,"name":"菜单管理","code":"000002"},
+			{"id":3,"name":"菜单信息","code":"000003"}
+			]
+	},
+	showSelectBox:true,
+	dragSelect:true,//使用右键点击并拖动进行框选，默认配置为ture(可以框选)
+	formatData:function(data){return data.rows;},
+	title: "ShowSelectBoxTable"
+});</code>	</pre>
+		</div>
+
+<h3>显示行的选择框，但不允许多选</h3>
+ 		<div  class="ShowMultiSelectBoxTable" ></div>
+ 		<div>
+			<h3>代码</h3>
+			<pre class="line-numbers"><code class="language-javascript">
+$("div.ShowMultiSelectBoxTable").table({
+	columns:[
+			{name:"id"},
+			{name:"name"},
+			{name:"code"}
+			],
+	data:{
+		total:"3",
+		rows:[
+			{"id":1,"name":"系统设置","code":"000001"},
+			{"id":2,"name":"菜单管理","code":"000002"},
+			{"id":3,"name":"菜单信息","code":"000003"}
+			]
+	},
+	showSelectBox:true,
+	multiSelect:false,
+	formatData:function(data){return data.rows;},
+	title: "ShowMultiSelectBoxTable"
+});</code>	</pre>
+		</div>
+
+
 	<h3>渲染列属性</h3>
-		<div class="renderTableStyle" ></div>
+		<div class="RenderTableStyleTable" ></div>
 		<div>
 			<h3>代码</h3>
 			<pre class="line-numbers"><code class="language-javascript">
@@ -174,12 +267,12 @@ formatData:function(data){return data.rows;},
 title: "renderTableStyle"
 });</code>	</pre>
 		</div>
-	<h3>调用插件本身的数据渲染函数，排序功能</h3>
-		<div class="renderTableDataSort" ></div>
+	<h3>数据渲染，排序功能</h3>
+		<div class="RenderTableStyleTable" ></div>
 		<div>
 			<h3>代码</h3>
 			<pre class="line-numbers"><code class="language-javascript">
-$("div.renderTableDataSort").table({
+$("div.RenderTableStyleTable").table({
 columns:[
 		{name:"id",width:200,display:'id(限宽200px)',render:function(rowData){return rowData.name;},sort:true},
 		{name:"name",display:"权限名称(居中)",align:"center",sort:true,sortName:"name"},
@@ -195,15 +288,15 @@ data:{
 		]
 },
 formatData:function(data){return data.rows;},
-title: "renderTableDataSort"
+title: "RenderTableStyleTable"
 });</code>	</pre>
 		</div>
 	<h3>添加自定义按钮，并调用插件内置函数</h3>
-		<div class="customButton" ></div>
+		<div class="CustomButtonTable" ></div>
 		<div>
 			<h3>代码</h3>
 			<pre class="line-numbers"><code class="language-javascript">
-$("div.customButton").table({
+$("div.CustomButtonTable").table({
 columns:[
 		{name:"id",render:function(rowData){return rowData.name;},width:200,display:'id(限宽200px)',sort:true},
 		{name:"name",display:"权限名称(居中)",align:"center",sort:true,sortName:"name"},
@@ -222,7 +315,7 @@ data:{
 		]
 },
 formatData:function(data){return data.rows;},
-title: "customButton",
+title: "CustomButtonTable",
 buttons:[
 		{
 		text : "统计选中行数",//按钮文字
