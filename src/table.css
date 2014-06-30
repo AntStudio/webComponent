@@ -14,29 +14,26 @@
 	margin-bottom: 0px;
 }
 
-.datagrid th.number{
+.datagrid>table>thead th.number{
 	width:25px;
 }
 
-.datagrid th [class^="fa-"]{
+.datagrid>table>thead th [class^="icon-"]{
 	float: right;
 	font-size: 20px;
 	color: #8D8989;
 }
 
-.datagrid th .transparent{
+.datagrid>table>thead th .transparent{
 	opacity:0;
 }
 
-.datagrid th.sort-column{
+ 
+.datagrid>table>thead th.sort-column{
 	cursor:pointer;
 }
 
-.datagrid th.sort-column .hide{
-	display:none;
-}
-
-.datagrid td.number{
+.datagrid>table>tbody td.number{
 	text-align:center;
 }
 
@@ -123,16 +120,6 @@
 	margin-right:10px;
 }
 
-.datagrid .drag-area{
-	position: absolute;
-	border: 1px dashed #91B4F1;
-	background:rgba(185, 213, 241, 0.7);
-}
-
-.datagrid .drag-area.hide{
-	display:none;
-}
-
 .datagrid .table-hover tr:hover>td{
 	background: #e9f3fd;
 }
@@ -154,7 +141,7 @@
 }
 
 /**
- *   ¹Ì¶¨²¼¾Ö
+ *   å›ºå®šå¸ƒå±€
  */
 .datagrid.fixed-layout .grid-pagination{
     position: absolute;

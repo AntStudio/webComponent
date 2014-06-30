@@ -21,7 +21,8 @@
 		showNumber:true,//是否显示序号(从1开始计数)
 		buttons:[],
 		emptyParent:true,//是否清空容器
-		dragSelect:true
+		dragSelect:true,
+		sortType:"asc"//默认排序方式
 	};
 
 	var methods  = {
@@ -153,7 +154,7 @@
 			var opts = tableInstance.opts;
 			var startIndex = (opts.currentDataSize==0)?0:((opts.pageIndex-1)*opts.pageSize+1);
 			var endIndex = (opts.currentDataSize==0)?0:(startIndex+opts.currentDataSize-1);
-			var pageCount = Math.ceil((opts.total||1)/opts.pageSize);
+			var pageCount = Math.ceil((opts.totalItemsCount||1)/opts.pageSize);
 			opts.pageCount = pageCount||1;
 
 			var $paginationDiv = methods.ce("div",{"class":"grid-pagination"});
@@ -173,7 +174,7 @@
 			$dataInfo.append(	methods.ce("span").html("当前显示"));
 			$dataInfo.append(	methods.ce("span",{"class":"current-data-info"}).html(startIndex+"~"+endIndex));
 			$dataInfo.append(	methods.ce("span").html("条,共"));
-			$dataInfo.append(	methods.ce("span",{"class":"total"}).html((opts.total||0)));
+			$dataInfo.append(	methods.ce("span",{"class":"total"}).html((opts.totalItemsCount||0)));
 			$dataInfo.append("条记录");
 			
 			$paginationDiv.append($dataInfo);
@@ -217,12 +218,12 @@
 			var $pagination = $(".grid-pagination",$container);
 			var startIndex = (opts.currentDataSize==0)?0:((opts.pageIndex-1)*opts.pageSize+1);
 			var endIndex = (opts.currentDataSize==0)?0:(startIndex+opts.currentDataSize-1);
-			var pageCount = Math.ceil((opts.total||1)/opts.pageSize);
+			var pageCount = Math.ceil((opts.totalItemsCount||1)/opts.pageSize);
 			opts.pageCount = pageCount||1;
 			$pagination.find(":text[name='currentPage']").val(opts.pageIndex||1);
 			$pagination.find(".pagecount").html(pageCount);
 			$pagination.find(".current-data-info").html(startIndex+"~"+endIndex);
-			$pagination.find(".total").html(opts.total||0);
+			$pagination.find(".total").html(opts.totalItemsCount||0);
 		},
 		//获取选中的行
 		getSelect:function(){
@@ -254,33 +255,57 @@
 			return changedRows;
 		},
 		//获取数据，分两种方式: 1.直接传递数据 2.ajax异步获取数据
+		//totalItemsCount 获取顺序： totalItemsCount-->formatData.totalItemsCount-->data.length-->calcTotalCount. 越靠后优先级越高
 		getData:function(){
 			var tableInstance = this;
 			var opts = tableInstance.opts;
 			var dfd = $.Deferred();
-			if(opts.data){
+			if(opts.data){ 
 				var data = opts.data;
-				opts.total = data.total;//默认从total中获取总条数
+				opts.totalItemsCount = data.totalItemsCount;//默认从totalItemsCount中获取总条数
+				var tableData = data.items||[];
+				if($.isFunction(opts.formatData)){//自定义格式化数据{items:[],totalItemsCount:20}
+					var temp = opts.formatData.call(tableInstance,tableData);
+					if(temp.items){
+						tableData = temp.items;
+					}
+					if(temp.totalItemsCount){
+						opts.totalItemsCount = temp.totalItemsCount;
+					}
+				}
+				if(!opts.totalItemsCount){//从数据中获取条数
+					opts.totalItemsCount = tableData.length;
+				}
+
 				if($.isFunction(opts.calcTotalCount)){//自定义计算总共的条数
-					opts.total = opts.calcTotalCount.call(tableInstance,data);
+					opts.totalItemsCount = opts.calcTotalCount.call(tableInstance,data);
 				}
-				if($.isFunction(opts.formatData)){//自定义格式化数据
-					data = opts.formatData.call(tableInstance,data);
-				}
-				dfd.resolve(data);
+				dfd.resolve(tableData);
 			}else{
 				$.ajax({
 					url:opts.url,
 					type:'Get',
 					dataType:'json',
 					data:$.extend({_random:Math.random()},{pageIndex:opts.pageIndex,pageSize:opts.pageSize},opts.params)
-				}).done(function(data){
-					opts.total = data.total;//默认从total中获取总条数
-					if($.isFunction(opts.calcTotalCount)){//自定义计算总共的条数
-						opts.total = opts.calcTotalCount.call(tableInstance,data);
+				}).done(function(result){
+					var data ;
+					opts.totalItemsCount = result.totalItemsCount;//默认从totalItemsCount中获取总条数
+					data = result.items||[];
+					if($.isFunction(opts.formatData)){//自定义格式化数据{items:[],totalItemsCount:20}
+						var temp = opts.formatData.call(tableInstance,result);
+						if(temp.items){
+							data = temp.items;
+						}
+						if(temp.totalItemsCount){
+							opts.totalItemsCount = temp.totalItemsCount;
+						}
 					}
-					if($.isFunction(opts.formatData)){//自定义格式化数据
-						data = opts.formatData.call(tableInstance,data);
+					if(!opts.totalItemsCount){//从数据中获取条数
+						opts.totalItemsCount = data.length;
+					}
+
+					if($.isFunction(opts.calcTotalCount)){//自定义计算总共的条数
+						opts.totalItemsCount = opts.calcTotalCount.call(tableInstance,result);
 					}
 					dfd.resolve(data);
 				}).fail(function(jqXHR, textStatus, errorThrown){
@@ -288,6 +313,22 @@
 				});
 			}
 			return dfd.promise();
+		},
+		sortData:function(data,sortName,sortType){
+			if(!data||data.length==0){
+				return [];
+			}
+			var temp;
+			for(var j = data.length - 1; j >= 1;j--){
+				for (var i = j; i >= 1;i-- ) {
+					 if(data[i][sortName]&&data[i][sortName]>(data[i-1][sortName])){
+					 	temp = data[i];
+					 	data[i] = data[i-1];
+					 	data[i-1] = temp;
+					 }
+				}
+			}
+			console.log(data);
 		},
 		//绑定事件
 		//1.分页按钮点击事件 2.排序事件 3.拖动选择事件

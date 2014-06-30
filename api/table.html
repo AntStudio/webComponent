@@ -55,6 +55,7 @@
 			<h3>配置</h3>
 			<pre class="line-numbers"><code class="language-javascript">
 $(selector).table({
+	   title:"表格标题",
 	   columns:[
 			    {
 					name:"id",//列名,应该整个table中唯一
@@ -67,8 +68,8 @@ $(selector).table({
 			    }...
 	           ],
 	    data  : {
-			     total:10,//表格数据总数，用于分页使用
-			     data :[]//应该为一个对应表头的数据数组
+			     totalItemsCount:10,//表格数据总数，用于分页使用
+			     items :[]//应该为一个对应表头的数据数组
 		    	}，
 	      url : "http://xxx/getData", //异步请求数据的接口，当data未定义时则会从url异步加载数据
        params : {},//需要传入异步请求接口的参数
@@ -83,7 +84,7 @@ showSelectBox : true,//是否显示单选框或复选框,具体由multiSelect决
   			      click : function(btnOpts){}//点击回调，上下文为table,btnOpts代表当前button的配置
   			     }...
                 ],
-   formatData : function(data){},//提取数据，用于在传入的数据格式和table接收的数据格式不一致时使用，data代表传入的数据对象
+   formatData : function(data){},//提取数据，用于在传入的数据格式和table接收的数据格式不一致时使用，data代表传入的数据对象,返回结果应该形为：{items:[],totalItemsCount:xxx}
    calcTotalCount:function(data){}//计算总条数,默认使用data.total
 });
 			</code></pre>

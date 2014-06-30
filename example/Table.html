@@ -23,14 +23,13 @@
 					{name:"code"}
 					],
 			data:{
-				total:"3",
-				rows:[
+				totalItemsCount:"3",
+				items:[
 					{"id":1,"name":"系统设置","code":"000001"},
 					{"id":2,"name":"菜单管理","code":"000002"},
 					{"id":3,"name":"菜单信息","code":"000003"}
 					]
 			},
-			formatData:function(data){return data.rows;},
 			title: "SimpleTable"
 		});
 		
@@ -41,8 +40,7 @@
 					{name:"code"}
 					],
 			data:{
-				total:"3",
-				rows:[
+				items:[
 					{"id":1,"name":"系统设置","code":"000001"},
 					{"id":2,"name":"菜单管理","code":"000002"},
 					{"id":3,"name":"菜单信息","code":"000003"}
@@ -50,7 +48,6 @@
 			},
 			multiSelect:true,
 			showSelectBox:true,
-			formatData:function(data){return data.rows;},
 			title: "ShowSelectBoxTable"
 		});
 
@@ -61,8 +58,7 @@
 					{name:"code"}
 					],
 			data:{
-				total:"3",
-				rows:[
+				items:[
 					{"id":1,"name":"系统设置","code":"000001"},
 					{"id":2,"name":"菜单管理","code":"000002"},
 					{"id":3,"name":"菜单信息","code":"000003"}
@@ -70,7 +66,6 @@
 			},
 			multiSelect:false,
 			showSelectBox:true,
-			formatData:function(data){return data.rows;},
 			title: "ShowMultiSelectBoxTable"
 		});
 
@@ -81,14 +76,12 @@
 					{name:"code",color:"green"}
 					],
 			data:{
-				total:"3",
-				rows:[
+				items:[
 					{"id":1,"name":"系统设置","code":"000001"},
 					{"id":2,"name":"菜单管理","code":"000002"},
 					{"id":3,"name":"菜单信息","code":"000003"}
 					]
 			},
-			formatData:function(data){return data.rows;},
 			title: "RenderTableStyleTable"
 		});
 
@@ -100,14 +93,12 @@
 					{display:'附加列测试(居右)',align:"right",render:function(columnData){return "测试内容 for "+columnData.name;}}
 					],
 			data:{
-				total:"3",
-				rows:[
+				items:[
 					{"id":1,"name":"系统设置","code":"000001"},
 					{"id":2,"name":"菜单管理","code":"000002"},
 					{"id":3,"name":"菜单信息","code":"000003"}
 					]
 			},
-			formatData:function(data){return data.rows;},
 			title: "RenderDataSortTable"
 		});
 
@@ -119,8 +110,8 @@
 					{display:'附加列测试(居右)',align:"right",render:function(columnData){return "测试内容 for "+columnData.name;}}
 					],
 			data:{
-				total:"18",
-				rows:[
+				totalItemsCount:"18",
+				items:[
 					{"id":1,"name":"系统设置","code":"000001"},
 					{"id":2,"name":"菜单管理","code":"000002"},
 					{"id":3,"name":"菜单信息","code":"000003"},
@@ -129,7 +120,6 @@
 					{"id":5,"name":"用户列表","code":"000006"}
 					]
 			},
-			formatData:function(data){return data.rows;},
 			title: "CustomButtonTable",
 			buttons:[
 					{
@@ -179,16 +169,16 @@ $("div.SimpleTable").table({
 			{name:"code"}
 			],
 	data:{
-		total:"3",
-		rows:[
+		totalItemsCount:"3",
+		items:[
 			{"id":1,"name":"系统设置","code":"000001"},
 			{"id":2,"name":"菜单管理","code":"000002"},
 			{"id":3,"name":"菜单信息","code":"000003"}
 			]
 	},
-	formatData:function(data){return data.rows;},
 	title: "SimpleTable"
-});</code>	</pre>
+});
+</code>	</pre>
 		</div>
 
 <h3>显示行的选择框，并允许多选</h3>
@@ -203,16 +193,14 @@ $("div.ShowSelectBoxTable").table({
 			{name:"code"}
 			],
 	data:{
-		total:"3",
-		rows:[
+		items:[
 			{"id":1,"name":"系统设置","code":"000001"},
 			{"id":2,"name":"菜单管理","code":"000002"},
 			{"id":3,"name":"菜单信息","code":"000003"}
 			]
 	},
+	multiSelect:true,
 	showSelectBox:true,
-	dragSelect:true,//使用右键点击并拖动进行框选，默认配置为ture(可以框选)
-	formatData:function(data){return data.rows;},
 	title: "ShowSelectBoxTable"
 });</code>	</pre>
 		</div>
@@ -229,16 +217,14 @@ $("div.ShowMultiSelectBoxTable").table({
 			{name:"code"}
 			],
 	data:{
-		total:"3",
-		rows:[
+		items:[
 			{"id":1,"name":"系统设置","code":"000001"},
 			{"id":2,"name":"菜单管理","code":"000002"},
 			{"id":3,"name":"菜单信息","code":"000003"}
 			]
 	},
-	showSelectBox:true,
 	multiSelect:false,
-	formatData:function(data){return data.rows;},
+	showSelectBox:true,
 	title: "ShowMultiSelectBoxTable"
 });</code>	</pre>
 		</div>
@@ -249,22 +235,20 @@ $("div.ShowMultiSelectBoxTable").table({
 		<div>
 			<h3>代码</h3>
 			<pre class="line-numbers"><code class="language-javascript">
-$("div.renderTableStyle").table({
-columns:[
-		{name:"id",display:'id(限宽200px)',width:200,},
-		{name:"name",display:"权限名称(居中)",align:"center"},
-		{name:"code",color:"green"}
-		],
-data:{
-	total:"3",
-	rows:[
-		{"id":1,"name":"系统设置","code":"000001"},
-		{"id":2,"name":"菜单管理","code":"000002"},
-		{"id":3,"name":"菜单信息","code":"000003"}
-		]
-},
-formatData:function(data){return data.rows;},
-title: "renderTableStyle"
+$("div.RenderTableStyleTable").table({
+	columns:[
+			{name:"id",display:'id(限宽200px)',width:200,},
+			{name:"name",display:"权限名称(居中)",align:"center"},
+			{name:"code",color:"green"}
+			],
+	data:{
+		items:[
+			{"id":1,"name":"系统设置","code":"000001"},
+			{"id":2,"name":"菜单管理","code":"000002"},
+			{"id":3,"name":"菜单信息","code":"000003"}
+			]
+	},
+	title: "RenderTableStyleTable"
 });</code>	</pre>
 		</div>
 	<h3>数据渲染，排序功能</h3>
@@ -272,23 +256,21 @@ title: "renderTableStyle"
 		<div>
 			<h3>代码</h3>
 			<pre class="line-numbers"><code class="language-javascript">
-$("div.RenderTableStyleTable").table({
-columns:[
-		{name:"id",width:200,display:'id(限宽200px)',render:function(rowData){return rowData.name;},sort:true},
-		{name:"name",display:"权限名称(居中)",align:"center",sort:true,sortName:"name"},
-		{name:"code"},
-		{display:'附加列测试(居右)',align:"right",render:function(columnData){return "测试内容 for "+columnData.name;}}
-		],
-data:{
-	total:"3",
-	rows:[
-		{"id":1,"name":"系统设置","code":"000001"},
-		{"id":2,"name":"菜单管理","code":"000002"},
-		{"id":3,"name":"菜单信息","code":"000003"}
-		]
-},
-formatData:function(data){return data.rows;},
-title: "RenderTableStyleTable"
+$("div.RenderDataSortTable").table({
+	columns:[
+			{name:"id",width:200,display:'id(限宽200px)',render:function(rowData){return rowData.name;},sort:true},
+			{name:"name",display:"权限名称(居中)",align:"center",sort:true,sortName:"name"},
+			{name:"code"},
+			{display:'附加列测试(居右)',align:"right",render:function(columnData){return "测试内容 for "+columnData.name;}}
+			],
+	data:{
+		items:[
+			{"id":1,"name":"系统设置","code":"000001"},
+			{"id":2,"name":"菜单管理","code":"000002"},
+			{"id":3,"name":"菜单信息","code":"000003"}
+			]
+	},
+	title: "RenderDataSortTable"
 });</code>	</pre>
 		</div>
 	<h3>添加自定义按钮，并调用插件内置函数</h3>
@@ -297,50 +279,49 @@ title: "RenderTableStyleTable"
 			<h3>代码</h3>
 			<pre class="line-numbers"><code class="language-javascript">
 $("div.CustomButtonTable").table({
-columns:[
-		{name:"id",render:function(rowData){return rowData.name;},width:200,display:'id(限宽200px)',sort:true},
-		{name:"name",display:"权限名称(居中)",align:"center",sort:true,sortName:"name"},
-		{name:"code"},
-		{display:'附加列测试(居右)',align:"right",render:function(columnData){return "测试内容 for "+columnData.name;}}
-		],
-data:{
-	total:"18",
-	rows:[
-		{"id":1,"name":"系统设置","code":"000001"},
-		{"id":2,"name":"菜单管理","code":"000002"},
-		{"id":3,"name":"菜单信息","code":"000003"},
-		{"id":4,"name":"用户权限","code":"000004"},
-		{"id":6,"name":"用户信息","code":"000005"},
-		{"id":5,"name":"用户列表","code":"000006"}
-		]
-},
-formatData:function(data){return data.rows;},
-title: "CustomButtonTable",
-buttons:[
-		{
-		text : "统计选中行数",//按钮文字
-		click : function(btnOpts){
-			var tableInstance = this;
-			alert("一共选择了 "+tableInstance.getSelect().length+"行");
-			}//点击回调，上下文为table,btnOpts代表当前button的配置
-		},
-		{
-		text : "刷新表格",
-		click : function(btnOpts){
-			var tableInstance = this;
-			tableInstance.refresh();
-			alert("表格已刷新");
+	columns:[
+			{name:"id",render:function(rowData){return rowData.name;},width:200,display:'id(限宽200px)',sort:true},
+			{name:"name",display:"权限名称(居中)",align:"center",sort:true,sortName:"name"},
+			{name:"code"},
+			{display:'附加列测试(居右)',align:"right",render:function(columnData){return "测试内容 for "+columnData.name;}}
+			],
+	data:{
+		totalItemsCount:"18",
+		items:[
+			{"id":1,"name":"系统设置","code":"000001"},
+			{"id":2,"name":"菜单管理","code":"000002"},
+			{"id":3,"name":"菜单信息","code":"000003"},
+			{"id":4,"name":"用户权限","code":"000004"},
+			{"id":6,"name":"用户信息","code":"000005"},
+			{"id":5,"name":"用户列表","code":"000006"}
+			]
+	},
+	title: "CustomButtonTable",
+	buttons:[
+			{
+			text : "统计选中行数",//按钮文字
+			click : function(btnOpts){
+				var tableInstance = this;
+				alert("一共选择了 "+tableInstance.getSelect().length+"行");
+				}//点击回调，上下文为table,btnOpts代表当前button的配置
+			},
+			{
+			text : "刷新表格",
+			click : function(btnOpts){
+				var tableInstance = this;
+				tableInstance.refresh();
+				alert("表格已刷新");
+				}
+			},
+			{
+			text : "导出json数据",
+			click : function(btnOpts){
+				var tableInstance = this;
+				console.log(tableInstance.getChangedRows());
+				alert("到控制台查看数据内容。。。");
+				}
 			}
-		},
-		{
-		text : "导出json数据",
-		click : function(btnOpts){
-			var tableInstance = this;
-			console.log(tableInstance.getChangedRows());
-			alert("到控制台查看数据内容。。。");
-			}
-		}
-		]
+			]
 });</code>	</pre>
 		</div>
  <script src="../plugin/prism/prism.js" type="text/javascript"></script>
