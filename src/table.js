@@ -9,6 +9,8 @@
  * @Date 2012-08-25
  */
 (function(){
+
+	var VERSION = "1.0.0";
 	var defaults = {
 		url:"",
 		columns:[],
