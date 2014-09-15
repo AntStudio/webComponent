@@ -43,16 +43,16 @@
 						$tr.addClass("selected");
 					}
 					
-					if(opts.showNumber){//处理序号列
-						var $seriesTd = methods.ce("td",{"class":"number"}).html(index+1);
-						$tr.append($seriesTd);
-					}
-
 					if(opts.showSelectBox){//处理单选框或复选框
 						var $selectTd = methods.ce("td");
 						var $selectBox = methods.ce("input",{"name":"selectBox","type":(opts.multiSelect?"checkbox":"radio")});
 						$selectTd.append($selectBox);
 						$tr.append($selectTd);
+					}
+
+					if(opts.showNumber){//处理序号列
+						var $seriesTd = methods.ce("td",{"class":"number"}).html(index+1);
+						$tr.append($seriesTd);
 					}
 
 					$.each(opts.columns,function(index,columnDefinition){//处理数据行
@@ -77,10 +77,7 @@
 			var $thead=methods.ce("thead");
 			var $tr = methods.ce("tr");
 			var opts = tableInstance.opts;
-			if(opts.showNumber){//渲染序列号表头
-				var $numberTh = methods.ce("th",{"class":"number"});
-				$tr.append($numberTh);
-			}
+
 			if(opts.showSelectBox){//渲染选择框表头
 				var $selectTh = methods.ce("th",{"class":"select-box"});
 				if(opts.multiSelect){
@@ -88,6 +85,12 @@
 				}
 				$tr.append($selectTh);
 			}
+
+			if(opts.showNumber){//渲染序列号表头
+				var $numberTh = methods.ce("th",{"class":"number"});
+				$tr.append($numberTh);
+			}
+
 			$.each(opts.columns,function(index,column){//渲染数据列表头
 				if(column.width){
 					if(typeof column.width=="number"){
