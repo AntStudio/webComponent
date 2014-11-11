@@ -8,8 +8,7 @@ var dialogCache = {};
 (function(){
 	var defaults = {
 		title:"",
-		buttons:[],
-		width:560
+		buttons:[]
 	};
 
 	var dialog  = {
@@ -17,7 +16,10 @@ var dialogCache = {};
 			var $contentHtml = this;
 			var selector = this.selector;
 			var $dialogDiv = $(document.createElement("div"));
-			$dialogDiv.addClass("modal hide fade");
+			$dialogDiv.addClass("modal fade");
+			
+			var $modalDialog = $(document.createElement("div")).addClass("modal-dialog");
+			var $modalContent = $(document.createElement("div")).addClass("modal-content");
 
 			var $dialogHeader = $(document.createElement("div"));
 			$dialogHeader.addClass("modal-header");
@@ -38,18 +40,22 @@ var dialogCache = {};
 
 			$.each(opts.buttons,function(index,btn){
 				var $btn = $(document.createElement("button"));
-				$btn.addClass(btn.css).html(btn.text);
+				$btn.addClass(btn.css||"btn btn-default").html(btn.text);
 				$btn.bind("click",function(){
 					btn.click.call($dialogDiv);
 				});
 				$btnGroup.append($btn);
 			});
+			
+			$contentHtml.removeClass("hide");
+			$modalContent.append($dialogHeader).append($dialogContent).append($btnGroup);
+			$modalDialog.append($modalContent);
+			$dialogDiv.append($modalDialog);
+			
+			
 
-			$dialogDiv.append($dialogHeader).append($dialogContent).append($btnGroup);
 
 			dialog.bindEvents.call($dialogDiv,opts);
-			$dialogDiv.css({"width":opts.width,
-							 "margin-left":-opts.width/2});
 			dialogCache[selector] = $dialogDiv;
 			$dialogDiv.modal("show");
 
