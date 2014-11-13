@@ -149,6 +149,12 @@
 .datagrid .drag-area.hide{
 	display:none;
 }
+
+.datagrid .space{
+	width:18px;
+	height:2px;
+	float:left;
+}
 /**
  *   固定布局
  */

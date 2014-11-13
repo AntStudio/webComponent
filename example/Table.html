@@ -25,12 +25,17 @@
 			data:{
 				totalItemsCount:"3",
 				items:[
-					{"id":1,"name":"系统设置","code":"000001"},
+					{"id":1,"name":"系统设置","code":"000001","_hasChildren":true},
 					{"id":2,"name":"菜单管理","code":"000002"},
 					{"id":3,"name":"菜单信息","code":"000003"}
 					]
 			},
-			title: "SimpleTable"
+			title: "SimpleTable",
+			childrenData:[
+					{"id":1,"name":"系统设置","code":"000001"},
+					{"id":2,"name":"菜单管理","code":"000002"},
+					{"id":3,"name":"菜单信息","code":"000003","_hasChildren":true}
+					]
 		});
 		
 		$("div.ShowSelectBoxTable").table({

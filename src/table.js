@@ -5,6 +5,7 @@
  * 		3、表格风格优化(done)
  * 		4、表格行选择支持(done)
  * 		5、拖拽式选择(done)
+ *		6、树形表格(not done)
  * @author Gavin Cook
  * @Date 2012-08-25
  */
@@ -13,6 +14,7 @@
 	var VERSION = "1.0.0";
 	var defaults = {
 		url:"",
+		rowId:"id",
 		columns:[],
 	    pageIndex:1,
 		pageSize:10,
@@ -24,6 +26,10 @@
 		buttons:[],
 		emptyParent:true,//是否清空容器
 		dragSelect:true,
+		treeTable:true,//是否开启树形菜单
+		treeColumn:"id",//哪一列作为树形表格的处理列
+		childrenPropertyName:"_hasChildren",//树形表格中，子行在父行中的标示名字
+		childrenData:[],
 		sortType:"asc"//默认排序方式
 	};
 
@@ -40,7 +46,7 @@
 				var $tbody = methods.ce("tbody");
 				tableDataCache[$container.selector]=data;
 				$.each(data,function(index,columnData){
-					var $tr = methods.ce("tr",{"data-number":index,"data-id":"tr_"+columnData[(opts.rowId||{})]});//data-number表示当前行的序号,用户获取选择行使用,从0开始计数
+					var $tr = methods.ce("tr",{"data-number":index,"level":0,"data-id":"tr_"+columnData[opts.rowId]||index });//data-number表示当前行的序号,用户获取选择行使用,从0开始计数
 					if(columnData.checked){//是否选中
 						$tr.addClass("selected");
 					}
@@ -56,22 +62,153 @@
 						var $seriesTd = methods.ce("td",{"class":"number"}).html(index+1);
 						$tr.append($seriesTd);
 					}
-
-					$.each(opts.columns,function(index,columnDefinition){//处理数据行
-						var $dataTd = methods.ce("td",{"style":"text-align:"+(columnDefinition.align||"left")+";"});//文字默认左对齐
-						if($.isFunction(columnDefinition.render)){
-							$dataTd.html(columnDefinition.render.call($dataTd,columnData));//如果有自定义渲染方法，则调用自定义渲染方法
-						}else{
-							$dataTd.html(columnData[columnDefinition.name]);//没有自定义渲染方法，默认通过column.name取值
-						}
-						$tr.append($dataTd);
-					});
+					if(opts.treeTable){//树形表格
+						$.each(opts.columns,function(index,columnDefinition){//处理数据行
+							var $dataTd = methods.ce("td",{"style":"text-align:"+(columnDefinition.align||"left")+";"});//文字默认左对齐
+							var isTreeColumn = opts.treeColumn === columnDefinition.name;
+							var $data = methods.ce("span");
+							if(columnData[opts.childrenPropertyName] === true && isTreeColumn){
+								var $icon =methods.ce("i",{"class":"fa fa-plus-square"});
+								$icon.click(function(){
+									if($icon.prop("expand") === true){
+										$icon.removeClass("fa-minus-square").addClass("fa-plus-square");
+										var $next = $tr.next();
+										var level = $tr.attr("level");
+										while($next.attr("level") != level){
+											$next.hide();
+											$next = $next.next();
+										}
+										$icon.prop("expand",false);
+									}else{
+										$icon.removeClass("fa-plus-square").addClass("fa-minus-square");
+										methods.renderChildrenData.call(tableInstance,$tr,columnData);
+										$icon.prop("expand",true);
+									}
+								});
+								$data.append($icon);
+							}
+							
+							
+							if($.isFunction(columnDefinition.render)){
+								$data.append(columnDefinition.render.call($dataTd,columnData));
+								$dataTd.append($data);//如果有自定义渲染方法，则调用自定义渲染方法
+							}else{
+								$data.append(columnData[columnDefinition.name]);
+								$dataTd.append($data);//没有自定义渲染方法，默认通过column.name取值
+							}
+							$tr.append($dataTd);
+						});
+					}else{
+						$.each(opts.columns,function(index,columnDefinition){//处理数据行
+							var $dataTd = methods.ce("td",{"style":"text-align:"+(columnDefinition.align||"left")+";"});//文字默认左对齐
+							if($.isFunction(columnDefinition.render)){
+								$dataTd.html(columnDefinition.render.call($dataTd,columnData));//如果有自定义渲染方法，则调用自定义渲染方法
+							}else{
+								$dataTd.html(columnData[columnDefinition.name]);//没有自定义渲染方法，默认通过column.name取值
+							}
+							$tr.append($dataTd);
+						});
+					}
+					
 					$tbody.append($tr);
 				});
 				dfd.resolve($tbody);
 			});
 
 			return dfd.promise();
+		},
+		//渲染树形表格的数据
+		renderChildrenData:function(parentRow,parentRowData){
+			var tableInstance = this;
+			var $tr = methods.ce("tr");
+			var opts = tableInstance.opts;
+			var $dfd = $.Deferred();
+			if($.isArray(opts.childrenData)){
+				$dfd.resolve(opts.childrenData);
+			}else if($.ifFunction(opts.childrenData.done)){
+				childrenData.call(tableInstance,parentRow,parentRowData).done(function(data){
+					$dfd.resolve(data);
+				});
+			}
+
+			$dfd.done(function(childrenData){	
+				$.each(childrenData,function(index,columnData){
+					var level = parseInt(parentRow.attr("level")||0);//层级
+					var currentLevel = level+1;
+
+					var $tr = methods.ce("tr",{"level":currentLevel,"data-number":index,"data-id":"tr_"+columnData[opts.rowId]||index });//data-number表示当前行的序号,用户获取选择行使用,从0开始计数
+					if(columnData.checked){//是否选中
+						$tr.addClass("selected");
+					}
+					
+					if(opts.showSelectBox){//处理单选框或复选框
+						var $selectTd = methods.ce("td");
+						var $selectBox = methods.ce("input",{"name":"selectBox","type":(opts.multiSelect?"checkbox":"radio")});
+						$selectTd.append($selectBox);
+						$tr.append($selectTd);
+					}
+
+					if(opts.showNumber){//处理序号列
+						var $seriesTd = methods.ce("td",{"class":"number"});//.html(index+1);
+						$tr.append($seriesTd);
+					}
+
+					if(opts.treeTable){//树形表格
+						$.each(opts.columns,function(index,columnDefinition){//处理数据行
+							var $dataTd = methods.ce("td",{"style":"text-align:"+(columnDefinition.align||"left")+";"});//文字默认左对齐
+							var isTreeColumn = opts.treeColumn === columnDefinition.name;
+							var $data = methods.ce("span");
+							
+							if(columnData[opts.childrenPropertyName] === true && isTreeColumn){
+								var $icon =methods.ce("i",{"class":"fa fa-plus-square"});
+								$icon.click(function(){
+									if($icon.prop("expand") === true){
+										$icon.removeClass("fa-minus-square").addClass("fa-plus-square");
+										var $next = $tr.next();
+										var level = $tr.attr("level");
+										while($next.attr("level") != level){
+											$next.hide();
+											$next = $next.next();
+										}
+										$icon.prop("expand",false);
+									}else{
+										$icon.removeClass("fa-plus-square").addClass("fa-minus-square");
+										methods.renderChildrenData.call(tableInstance,$tr,columnData);
+										$icon.prop("expand",true);
+									}
+								});
+								$data.append($icon);
+							}
+
+							while(level>=0){
+								$dataTd.append(methods.ce("div",{"class":"space"}));
+								level--;
+							}
+							
+							if($.isFunction(columnDefinition.render)){
+								$data.append(columnDefinition.render.call($dataTd,columnData));
+								$dataTd.append($data);//如果有自定义渲染方法，则调用自定义渲染方法
+							}else{
+								$data.append(columnData[columnDefinition.name]);
+								$dataTd.append($data);//没有自定义渲染方法，默认通过column.name取值
+							}
+					
+							$tr.append($dataTd);
+						});
+					}else{
+						$.each(opts.columns,function(index,columnDefinition){//处理数据行
+							var $dataTd = methods.ce("td",{"style":"text-align:"+(columnDefinition.align||"left")+";"});//文字默认左对齐
+							if($.isFunction(columnDefinition.render)){
+								$dataTd.html(columnDefinition.render.call($dataTd,columnData));//如果有自定义渲染方法，则调用自定义渲染方法
+							}else{
+								$dataTd.html(columnData[columnDefinition.name]);//没有自定义渲染方法，默认通过column.name取值
+							}
+							$tr.append($dataTd);
+						});
+					}
+					parentRow.after($tr);
+				});
+			});
 		},
 		//渲染表头
 		renderHeader:function(){
