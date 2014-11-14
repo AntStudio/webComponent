@@ -14,8 +14,8 @@
 	margin-bottom: 0px;
 }
 
-.datagrid>table>thead th.number{
-	width:25px;
+.datagrid th.number{
+	width:45px;
 }
 
 .datagrid>table>thead th [class^="icon-"]{
@@ -148,6 +148,18 @@
 
 .datagrid .drag-area.hide{
 	display:none;
+}
+
+.datagrid .space{
+	width:18px;
+	height:2px;
+	float:left;
+}
+
+.datagrid .tree-icon{
+	color: #3B7DE4;
+	font-size: 12px;
+	margin:0 3px;
 }
 /**
  *   固定布局
